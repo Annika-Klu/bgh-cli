@@ -51,6 +51,7 @@ class ChurchTools {
             try {
                 Out-Message "Lade Nutzerdaten..."
                 $userData = $this.CallApi("GET", "whoami", $null, $null)
+                # to do: identify CLI group and if user is not a member, add them. Separate method.
                 $groups = $this.CallApi("GET", "persons/$($userData.id)/groups", $null, $null)
                 $this.User = [PSCustomObject]@{
                     firstName   = $userData.firstName

@@ -2,6 +2,7 @@ Add-Type -AssemblyName Microsoft.VisualBasic
 
 $releaseVersion = "__RELEASE_TAG__"
 $ReleasesUrl = "__RELEASES_URL__"
+$GitHubToken = "__GH_TOKEN__"
 $ZipFile = "$env:TEMP\bgh.zip"
 $InstallPath = "$env:USERPROFILE\.bgh"
 $MainPS1File = Join-Path $InstallPath "bgh.ps1"
@@ -51,7 +52,7 @@ function Write-EnvFile {
 RELEASES_URL=$ReleasesUrl
 VERSION=$releaseVersion
 CT_SUBDOMAIN=__CT_SUBDOMAIN__
-GH_TOKEN=__GH_TOKEN__
+GH_TOKEN=$GitHubToken
 "@
     Set-Content -Path $EnvFile -Value $content -Encoding UTF8
 }
@@ -74,6 +75,7 @@ try {
         New-Item -ItemType Directory -Path $InstallPath | Out-Null
     }
 
+    Set-Variable -Name "GH_TOKEN" -Value $GitHubToken -Scope Global
     $moduleFilePath = Get-GitHubModule
     Import-Module $moduleFilePath -Force
 
