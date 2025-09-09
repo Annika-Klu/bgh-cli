@@ -17,8 +17,8 @@ function Invoke-UpdateBootstrap {
     }
 
     Out-Message "Lade neuen CLI-Code herunter..."
-    $latestRelease = Get-LatestRelease -ReleasesUrl $RELEASES_URL
-    $cliCode = Get-ReleaseAsset -Release $latestRelease -AssetName "bgh-cli.zip"
+    $latestRelease = Get-LatestRelease -GitHubToken $GH_TOKEN -ReleasesUrl $RELEASES_URL
+    $cliCode = Get-ReleaseAsset -GitHubToken $GH_TOKEN -Release $latestRelease -AssetName "bgh-cli.zip"
     $NewCodeZipFile = Join-Path $TempDir "bgh-cli.zip"
     Invoke-WebRequest -Uri $cliCode.browser_download_url -OutFile $NewCodeZipFile -UseBasicParsing -Headers $GitHubHeaders
     

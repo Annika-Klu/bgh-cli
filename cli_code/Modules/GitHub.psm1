@@ -1,9 +1,11 @@
-$GitHubHeaders = @{ Authorization = "Bearer $GH_TOKEN" }
+$GitHubHeaders = @{ Authorization = "" }
 
 function Get-LatestRelease {
     param(
+        [string]$GitHubToken,
         [string]$ReleasesUrl
     )
+    $GitHubHeaders["Authorization"] = "Bearer $GitHubToken"
     try {
         $response = Invoke-WebRequest -Uri $ReleasesUrl -Headers $GitHubHeaders
     } catch {
@@ -19,9 +21,11 @@ function Get-LatestRelease {
 
 function Get-ReleaseAsset {
     param(
+        [string]$GitHubToken,
         [PSObject]$Release,
         [string]$AssetName
     )
+    $GitHubHeaders["Authorization"] = "Bearer $GitHubToken"
     $assetsResponse = Invoke-WebRequest -Uri $Release.assets_url -Headers $GitHubHeaders
     $assets = $assetsResponse.Content | ConvertFrom-Json
     if ($assets.Count -eq 0) {

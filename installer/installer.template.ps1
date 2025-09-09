@@ -32,8 +32,8 @@ function Assert-Compatibility {
 
 function Get-CLICode {
     try {
-        $latestRelease = Get-LatestRelease -ReleasesUrl $ReleasesUrl
-        $cliCode = Get-ReleaseAsset -Release $latestRelease -AssetName "bgh-cli.zip"
+        $latestRelease = Get-LatestRelease -GitHubToken $GitHubToken -ReleasesUrl $ReleasesUrl
+        $cliCode = Get-ReleaseAsset -GitHubToken $GitHubToken -Release $latestRelease -AssetName "bgh-cli.zip"
         Invoke-WebRequest -Uri $cliCode.browser_download_url -OutFile $ZipFile -UseBasicParsing
     } catch {
         throw "ZIP-Datei konnte nicht heruntergeladen werden: $_"
@@ -75,7 +75,6 @@ try {
         New-Item -ItemType Directory -Path $InstallPath | Out-Null
     }
 
-    Set-Variable -Name "GH_TOKEN" -Value $GitHubToken -Scope Global
     $moduleFilePath = Get-GitHubModule
     Import-Module $moduleFilePath -Force
 

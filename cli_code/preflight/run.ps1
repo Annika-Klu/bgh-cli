@@ -14,7 +14,7 @@ function Test-PSVersion {
 }
 
 function Test-CliVersion {
-    $latestRelease = Get-LatestRelease -ReleasesUrl $RELEASES_URL
+    $latestRelease = Get-LatestRelease -GitHubToken $GH_TOKEN -ReleasesUrl $RELEASES_URL
     $versionRegex = "(?<=^v)(\d+\.\d+\.\d+)"
     if ($latestRelease.tag_name -match $versionRegex) {
         $latestReleaseVersionStr = $matches[0]
