@@ -77,7 +77,6 @@ try {
     Write-EnvFile
     Set-CmdShim
 
-    Remove-Item $moduleFilePath -Force
     [Microsoft.VisualBasic.Interaction]::MsgBox(
         "BGH-CLI wurde erfolgreich installiert.`nDu kannst jetzt in PowerShell den Befehl 'bgh hilfe' verwenden.",
         "OKOnly,Information",
