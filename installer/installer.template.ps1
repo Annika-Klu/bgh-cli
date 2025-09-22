@@ -1,5 +1,5 @@
 Add-Type -AssemblyName Microsoft.VisualBasic
-Import-Module "GitHub.psm1"
+Import-Module "$PSScriptRoot/GitHub.psm1"
 
 $releaseVersion = "__RELEASE_TAG__"
 $ReleasesUrl = "__RELEASES_URL__"
