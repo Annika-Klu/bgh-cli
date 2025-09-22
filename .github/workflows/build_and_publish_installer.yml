@@ -44,8 +44,6 @@ jobs:
                               -replace '__GH_TOKEN__', $env:GH_TOKEN_TO_CHECK_RELEASES
           $script | Set-Content installer/installer.ps1 -Encoding UTF8
 
-            - name: Create installer script from template
-
       - name: Copy GitHub.psm1 module to installer
         shell: pwsh
         run: |
