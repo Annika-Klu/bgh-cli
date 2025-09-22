@@ -9,12 +9,14 @@ $MainPS1File = Join-Path $InstallPath "bgh.ps1"
 $CmdShim = Join-Path $env:USERPROFILE "AppData\Local\Microsoft\WindowsApps\bgh.cmd"
 $EnvFile = Join-Path $InstallPath ".env"
 
-function Get-GitHubModule {
-    $url = $ReleasesUrl -replace "api.github.com/repos", "raw.githubusercontent.com"
-    $url = $url -replace "releases", "master/cli_code/Modules/GitHub.psm1"
-    $moduleFilePath = Join-Path $PSScriptRoot "GitHub.psm1"
-    Invoke-WebRequest -Uri $url -OutFile $moduleFilePath
-    return $moduleFilePath
+function Copy-GitHubModule {
+    $moduleFilePath = Join-Path $PSScriptRoot "../cli_code/Modules/GitHub.psm1"
+    if (-not (Test-Path $moduleFilePath)) {
+        throw "Modul 'GitHub.psm1' nicht gefunden."
+    }
+    $savePath = Join-Path $PSScriptRoot "GitHub.psm1"
+    Copy-Item -Path $moduleFilePath -Destination $savePath
+    return $savePath
 }
 
 function Assert-Compatibility {
@@ -75,13 +77,14 @@ try {
         New-Item -ItemType Directory -Path $InstallPath | Out-Null
     }
 
-    $moduleFilePath = Get-GitHubModule
+    $moduleFilePath = Copy-GitHubModule
     Import-Module $moduleFilePath -Force
 
     Get-CLICode
     if (!(Test-Path $MainPS1File)) {
         throw "Die Haupt-Datei wurde nicht gefunden."
     }
+    
     Add-InitFlag
     Write-EnvFile
     Set-CmdShim

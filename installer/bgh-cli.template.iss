@@ -15,6 +15,7 @@ AppContact=__PUBLISHER_EMAIL__
 
 [Files]
 Source: "installer.ps1"; DestDir: "{tmp}"; Flags: deleteafterinstall
+Source: "GitHub.psm1"; DestDir: "{tmp}"; Flags: deleteafterinstall
 Source: "icon.ico"; DestDir: "{tmp}"; Flags: deleteafterinstall
 
 [Run]
