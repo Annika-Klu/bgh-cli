@@ -1,4 +1,5 @@
 Add-Type -AssemblyName Microsoft.VisualBasic
+Import-Module "GitHub.psm1"
 
 $releaseVersion = "__RELEASE_TAG__"
 $ReleasesUrl = "__RELEASES_URL__"
@@ -8,16 +9,6 @@ $InstallPath = "$env:USERPROFILE\.bgh"
 $MainPS1File = Join-Path $InstallPath "bgh.ps1"
 $CmdShim = Join-Path $env:USERPROFILE "AppData\Local\Microsoft\WindowsApps\bgh.cmd"
 $EnvFile = Join-Path $InstallPath ".env"
-
-function Copy-GitHubModule {
-    $moduleFilePath = Join-Path $PSScriptRoot "../cli_code/Modules/GitHub.psm1"
-    if (-not (Test-Path $moduleFilePath)) {
-        throw "Modul 'GitHub.psm1' nicht gefunden."
-    }
-    $savePath = Join-Path $PSScriptRoot "GitHub.psm1"
-    Copy-Item -Path $moduleFilePath -Destination $savePath
-    return $savePath
-}
 
 function Assert-Compatibility {
     $psVersion = $PSVersionTable.PSVersion.Major
@@ -77,14 +68,11 @@ try {
         New-Item -ItemType Directory -Path $InstallPath | Out-Null
     }
 
-    $moduleFilePath = Copy-GitHubModule
-    Import-Module $moduleFilePath -Force
-
     Get-CLICode
     if (!(Test-Path $MainPS1File)) {
         throw "Die Haupt-Datei wurde nicht gefunden."
     }
-    
+
     Add-InitFlag
     Write-EnvFile
     Set-CmdShim

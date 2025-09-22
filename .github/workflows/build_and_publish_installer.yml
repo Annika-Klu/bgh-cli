@@ -44,6 +44,29 @@ jobs:
                               -replace '__GH_TOKEN__', $env:GH_TOKEN_TO_CHECK_RELEASES
           $script | Set-Content installer/installer.ps1 -Encoding UTF8
 
+            - name: Create installer script from template
+        shell: pwsh
+        run: |
+          $template = Get-Content installer/installer.template.ps1 -Raw -Encoding UTF8
+          $script = $template -replace '__RELEASES_URL__', $env:RELEASES_URL `
+                              -replace '__RELEASE_TAG__', $env:RELEASE_TAG `
+                              -replace '__CT_SUBDOMAIN__', $env:CT_SUBDOMAIN `
+                              -replace '__GH_TOKEN__', $env:GH_TOKEN_TO_CHECK_RELEASES
+          $script | Set-Content installer/installer.ps1 -Encoding UTF8
+
+      - name: Copy GitHub.psm1 module to installer
+        shell: pwsh
+        run: |
+          $destinationPath = "installer"
+          $sourcePath = "cli_code/Modules/GitHub.psm1"
+      
+          if (Test-Path $sourcePath) {
+            Copy-Item -Path $sourcePath -Destination $destinationPath -Force
+            Write-Host "MeinModul.psm1 wurde erfolgreich nach '$destinationPath' kopiert."
+          } else {
+            Write-Error "Die Datei 'MeinModul.psm1' wurde nicht gefunden: $sourcePath"
+          }
+
       - name: Create Inno Setup script from template
         working-directory: installer
         shell: pwsh
