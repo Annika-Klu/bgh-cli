@@ -33,7 +33,7 @@ function Get-ReleaseAsset {
     }
     $asset = $assets | Where-Object { $_.name -eq $AssetName }
     if (-not $asset) {
-        throw "Die relevanten Dateien wurden nicht in den Release Assets gefunden."
+        throw "$AssetName wurde nicht in den Assets für Release $($Release.tag_name) gefunden."
     }
     return $asset
 }
