@@ -1,8 +1,8 @@
 try {
     $version = $VERSION
-    $latestRelease = Get-LatestRelease -ReleasesUrl $RELEASES_URL
+    $latestRelease = Get-LatestRelease -GitHubToken $GH_TOKEN -ReleasesUrl $RELEASES_URL
     if ($version -eq $latestRelease.tag_name) {
-        Out-Message "Churchtools-CLI ist aktuell ($VERSION)"
+        Out-Message "BGH-CLI ist aktuell ($VERSION)"
     } else {
         $newEnvVar = @{ "VERSION" = $latestRelease.tag_name }
         Update-Dotenv -KeyValuePairs $newEnvVar

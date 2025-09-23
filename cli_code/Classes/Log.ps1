@@ -20,4 +20,4 @@ class Log {
     }
 }
 
-$log = [Log]::new("ct")
+$log = [Log]::new("bgh")

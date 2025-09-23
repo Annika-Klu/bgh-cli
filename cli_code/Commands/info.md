@@ -1,0 +1,1 @@
+Infos zur verwendeten Version des CLI und zum angemeldeten Nutzer.

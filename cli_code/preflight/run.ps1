@@ -1,8 +1,6 @@
 . "$PSScriptRoot/loadClassesAndModules.ps1"
 . "$PSScriptRoot/installRequirements.ps1"
 
-Get-DotEnv
-
 function Set-Encoding {
     [Console]::OutputEncoding = [Text.UTF8Encoding]::new()
     [Console]::InputEncoding = [Text.UTF8Encoding]::new()
@@ -16,7 +14,7 @@ function Test-PSVersion {
 }
 
 function Test-CliVersion {
-    $latestRelease = Get-LatestRelease -ReleasesUrl $RELEASES_URL
+    $latestRelease = Get-LatestRelease -GitHubToken $GH_TOKEN -ReleasesUrl $RELEASES_URL
     $versionRegex = "(?<=^v)(\d+\.\d+\.\d+)"
     if ($latestRelease.tag_name -match $versionRegex) {
         $latestReleaseVersionStr = $matches[0]
@@ -29,8 +27,8 @@ function Test-CliVersion {
         $currentVersion = [Version]$currentVersionStr
     }
     if ($currentVersion -lt $latestReleaseVersion) {
-        Out-Message "[HINWEIS] Churchtools-CLI $($latestRelease.tag_name) ist jetzt verfügbar." warning
-        Out-Message "Deine Version ist $VERSION. Führe 'ct update' aus, um sie zu aktualisieren.`n" warning
+        Out-Message "[HINWEIS] BGH-CLI $($latestRelease.tag_name) ist jetzt verfügbar." warning
+        Out-Message "Deine Version ist $VERSION. Führe 'bgh update' aus, um sie zu aktualisieren.`n" warning
     }
 }
 
@@ -38,10 +36,11 @@ $initFile = Join-Path $PWD "init"
 
 try {
     if (Test-Path $initFile) {
+        Get-DotEnv
         Set-CliEnv
         Remove-Item $initFile -ErrorAction SilentlyContinue
-        Get-DotEnv
     }
+    Get-DotEnv
     Set-Encoding
     Test-PSVersion
     Test-CliVersion

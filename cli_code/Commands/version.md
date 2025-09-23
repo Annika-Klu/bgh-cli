@@ -1,1 +1,0 @@
-Aktuelle Version des CLI.

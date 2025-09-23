@@ -1,20 +1,14 @@
 Add-Type -AssemblyName Microsoft.VisualBasic
+Import-Module "$PSScriptRoot/GitHub.psm1"
 
 $releaseVersion = "__RELEASE_TAG__"
 $ReleasesUrl = "__RELEASES_URL__"
-$ZipFile = "$env:TEMP\ct.zip"
-$InstallPath = "$env:USERPROFILE\.ct"
-$MainPS1File = Join-Path $InstallPath "ct.ps1"
-$CmdShim = Join-Path $env:USERPROFILE "AppData\Local\Microsoft\WindowsApps\ct.cmd"
+$GitHubToken = "__GH_TOKEN__"
+$ZipFile = "$env:TEMP\bgh.zip"
+$InstallPath = "$env:USERPROFILE\.bgh"
+$MainPS1File = Join-Path $InstallPath "bgh.ps1"
+$CmdShim = Join-Path $env:USERPROFILE "AppData\Local\Microsoft\WindowsApps\bgh.cmd"
 $EnvFile = Join-Path $InstallPath ".env"
-
-function Get-GitHubModule {
-    $url = $ReleasesUrl -replace "api.github.com/repos", "raw.githubusercontent.com"
-    $url = $url -replace "releases", "master/cli_code/Modules/GitHub.psm1"
-    $moduleFilePath = Join-Path $PSScriptRoot "GitHub.psm1"
-    Invoke-WebRequest -Uri $url -OutFile $moduleFilePath
-    return $moduleFilePath
-}
 
 function Assert-Compatibility {
     $psVersion = $PSVersionTable.PSVersion.Major
@@ -31,8 +25,8 @@ function Assert-Compatibility {
 
 function Get-CLICode {
     try {
-        $latestRelease = Get-LatestRelease -ReleasesUrl $ReleasesUrl
-        $cliCode = Get-ReleaseAsset -Release $latestRelease -AssetName "ct-cli.zip"
+        $latestRelease = Get-LatestRelease -GitHubToken $GitHubToken -ReleasesUrl $ReleasesUrl
+        $cliCode = Get-ReleaseAsset -GitHubToken $GitHubToken -Release $latestRelease -AssetName "bgh-cli.zip"
         Invoke-WebRequest -Uri $cliCode.browser_download_url -OutFile $ZipFile -UseBasicParsing
     } catch {
         throw "ZIP-Datei konnte nicht heruntergeladen werden: $_"
@@ -51,7 +45,7 @@ function Write-EnvFile {
 RELEASES_URL=$ReleasesUrl
 VERSION=$releaseVersion
 CT_SUBDOMAIN=__CT_SUBDOMAIN__
-GH_TOKEN=__GH_TOKEN__
+GH_TOKEN=$GitHubToken
 "@
     Set-Content -Path $EnvFile -Value $content -Encoding UTF8
 }
@@ -74,20 +68,17 @@ try {
         New-Item -ItemType Directory -Path $InstallPath | Out-Null
     }
 
-    $moduleFilePath = Get-GitHubModule
-    Import-Module $moduleFilePath -Force
-
     Get-CLICode
     if (!(Test-Path $MainPS1File)) {
         throw "Die Haupt-Datei wurde nicht gefunden."
     }
+
     Add-InitFlag
     Write-EnvFile
     Set-CmdShim
 
-    Remove-Item $moduleFilePath -Force
     [Microsoft.VisualBasic.Interaction]::MsgBox(
-        "ChurchTools CLI wurde erfolgreich installiert.`n`nDu kannst jetzt in PowerShell den Befehl `ct hilfe` verwenden.",
+        "BGH-CLI wurde erfolgreich installiert.`nDu kannst jetzt in PowerShell den Befehl 'bgh hilfe' verwenden.",
         "OKOnly,Information",
         "Installation abgeschlossen"
     )

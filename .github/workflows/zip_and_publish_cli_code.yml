@@ -19,7 +19,7 @@ jobs:
       - name: Zip CLI Code
         run: |
           cd cli_code
-          zip -r ../ct-cli.zip .
+          zip -r ../bgh-cli.zip .
 
       - name: Upload CLI code to current release
         if: github.event_name == 'release' && github.event.action == 'published'
@@ -28,6 +28,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ct-cli.zip
-          asset_name: ct-cli.zip
+          asset_path: bgh-cli.zip
+          asset_name: bgh-cli.zip
           asset_content_type: application/octet-stream

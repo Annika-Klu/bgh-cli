@@ -2,7 +2,7 @@ function Invoke-UpdateBootstrap {
     param(
         [string]$InstallPath
     )
-    $TempDir = Join-Path $env:TEMP "ct-update"
+    $TempDir = Join-Path $env:TEMP "bgh-update"
     Remove-Item -Recurse -Force -Path $TempDir -ErrorAction SilentlyContinue
 
     $KeepFilesDir = Join-Path $TempDir "keep"
@@ -17,9 +17,9 @@ function Invoke-UpdateBootstrap {
     }
 
     Out-Message "Lade neuen CLI-Code herunter..."
-    $latestRelease = Get-LatestRelease -ReleasesUrl $RELEASES_URL
-    $cliCode = Get-ReleaseAsset -Release $latestRelease -AssetName "ct-cli.zip"
-    $NewCodeZipFile = Join-Path $TempDir "ct-cli.zip"
+    $latestRelease = Get-LatestRelease -GitHubToken $GH_TOKEN -ReleasesUrl $RELEASES_URL
+    $cliCode = Get-ReleaseAsset -GitHubToken $GH_TOKEN -Release $latestRelease -AssetName "bgh-cli.zip"
+    $NewCodeZipFile = Join-Path $TempDir "bgh-cli.zip"
     Invoke-WebRequest -Uri $cliCode.browser_download_url -OutFile $NewCodeZipFile -UseBasicParsing -Headers $GitHubHeaders
     
     Out-Message "Bereite Update-Skript vor..."
@@ -37,7 +37,7 @@ function Register-UpdateWorker {
     Add-Type -AssemblyName Microsoft.VisualBasic
     try {
         Write-Host "Extrahiere neuen Code ins Zielverzeichnis..."
-        Expand-Archive -Path (Join-Path $PSScriptRoot "ct-cli.zip") -DestinationPath $InstallPath -Force
+        Expand-Archive -Path (Join-Path $PSScriptRoot "bgh-cli.zip") -DestinationPath $InstallPath -Force
         Write-Host "Stelle gesicherte Dateien wieder her..."
         $KeepDir = Join-Path $PSScriptRoot "keep"
         if (Test-Path $KeepDir) {

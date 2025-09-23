@@ -1,4 +1,4 @@
-# BGH Churchtools-CLI
+# BGH-CLI
 
-Command Line Interface to interact with BGH churchtools instance.
-Based on churchtools REST API, authentication using personal API Token.
+Command Line Interface for BGH tasks.
+Based on our churchtools account's REST API, authentication using personal API Token.

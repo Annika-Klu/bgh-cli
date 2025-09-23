@@ -29,15 +29,16 @@ function Set-ApiUrl {
     return "$churchUrl/api"
 }
 
-function Set-ApiToken {
+function Save-ApiToken {
     param(
         [string]$ApiUrl
     )
     do {
         try {
             Write-Host ""
-            $token = Read-Host "Bitte gib dein Login-Token ein"
-            $ct = [ChurchTools]::new($ApiUrl, $token)
+            $pastedToken = Read-Host "Bitte gib dein Login-Token ein"
+            Save-EncryptedToken -Token $pastedToken -Path (Join-Path $PWD "ctlogintoken.sec")
+            $ct = [ChurchTools]::new($ApiUrl)
             Out-Message "Authentifiziert als $($ct.User.firstName) $($ct.User.lastName)"
             $isValid = $true
         } catch {
@@ -45,7 +46,6 @@ function Set-ApiToken {
             $isValid = $false
         }
     } until ($isValid)
-    return $token
 }
 
 function Set-OutDir {
@@ -76,13 +76,13 @@ Für die Ersteinrichtung brauchst du dein Churchtools-Login-Token. Um es zu find
 
 function Set-CliEnv {
     Out-Line
-    Out-Message  "Willkommen zum Churchtools-CLI!"
+    Out-Message  "Willkommen zum BGH-CLI!"
     Out-Line
     Out-Message  $initialSetupInfo
     Out-Line
     $envVars = @{}
     $envVars["CT_API_URL"] = Set-ApiUrl
-    $envVars["CT_API_TOKEN"] = Set-ApiToken -ApiUrl $envVars["CT_API_URL"]
+    Save-ApiToken -ApiUrl $envVars["CT_API_URL"]
     $envVars["OUT_DIR"] = Set-OutDir
     Update-DotEnv -KeyValuePairs $envVars
     Out-Message "Danke für deine Angaben! Das CLI ist jetzt fertig konfiguriert."

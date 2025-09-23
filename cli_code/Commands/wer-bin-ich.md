@@ -1,1 +1,0 @@
-Informationen über den aktuell angemeldeten Nutzer.

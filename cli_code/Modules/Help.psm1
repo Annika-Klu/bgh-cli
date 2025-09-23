@@ -12,9 +12,9 @@ function Show-Help {
         $folderName = Split-Path $relativePath -Leaf
 
         if ($folderName -match "Commands") {
-            Out-Message ("{0,-14} {1}" -f "[Allgemein]", "Verwendung: 'ct <befehl>'`n")
+            Out-Message ("{0,-14} {1}" -f "[Allgemein]", "Verwendung: 'bgh <befehl>'`n")
         } else {
-            Out-Message ("{0,-14} {1}" -f "[$folderName]" , "Verwendung: 'ct $folderName <befehl>'`n")
+            Out-Message ("{0,-14} {1}" -f "[$folderName]" , "Verwendung: 'bgh $folderName <befehl>'`n")
         }
 
         $helpItems = foreach ($cmd in $group.Group | Sort-Object Name) {

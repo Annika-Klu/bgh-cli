@@ -1,9 +1,11 @@
-$GitHubHeaders = @{ Authorization = "Bearer $GH_TOKEN" }
+$GitHubHeaders = @{ Authorization = "" }
 
 function Get-LatestRelease {
     param(
+        [string]$GitHubToken,
         [string]$ReleasesUrl
     )
+    $GitHubHeaders["Authorization"] = "Bearer $GitHubToken"
     try {
         $response = Invoke-WebRequest -Uri $ReleasesUrl -Headers $GitHubHeaders
     } catch {
@@ -19,9 +21,11 @@ function Get-LatestRelease {
 
 function Get-ReleaseAsset {
     param(
+        [string]$GitHubToken,
         [PSObject]$Release,
         [string]$AssetName
     )
+    $GitHubHeaders["Authorization"] = "Bearer $GitHubToken"
     $assetsResponse = Invoke-WebRequest -Uri $Release.assets_url -Headers $GitHubHeaders
     $assets = $assetsResponse.Content | ConvertFrom-Json
     if ($assets.Count -eq 0) {
@@ -29,7 +33,7 @@ function Get-ReleaseAsset {
     }
     $asset = $assets | Where-Object { $_.name -eq $AssetName }
     if (-not $asset) {
-        throw "Die relevanten Dateien wurden nicht in den Release Assets gefunden."
+        throw "$AssetName wurde nicht in den Assets für Release $($Release.tag_name) gefunden."
     }
     return $asset
 }
