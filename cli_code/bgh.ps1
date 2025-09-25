@@ -6,7 +6,7 @@ param (
 
 Set-Location -Path $PSScriptRoot
 
-. "$PSScriptRoot/preflight/run.ps1"
+. "$PSScriptRoot/preflight/run.ps1" -Command $Command
 
 function Use-MentionHelp {
     Out-Message "Mit 'bgh hilfe' kannst du eine Liste aller Befehle anzeigen lassen."
@@ -19,20 +19,21 @@ try {
         exit 1
     }
 
-    $args = @{}
+    $parsedCmd = @{}
     if ($AdditionalArgs.Count -gt 0) {
-        $argsStr = $AdditionalArgs -join " "
-        $args = Get-ParsedArgs -ArgsStr $argsStr
+        $parsedCmdStr = $AdditionalArgs -join " "
+        $parsedCmd = Get-ParsedCmd -ArgsStr $parsedCmdStr
+        Set-Variable -Name "parsedCmd" -Value $parsedCmd -Scope Global
     }
 
-    if ($args.Flags.debug) {
-        Out-Message "Subcommands: $($args.Subcommands -join ', ')" debug
-        Out-Message "Arguments: $($args.Arguments | Out-String)" debug
-        Out-Message "Flags: $($args.Flags | Out-String)" debug
+    if ($parsedCmd.Flags.debug) {
+        Out-Message "Subcommands: $($parsedCmd.Subcommands -join ', ')" debug
+        Out-Message "Arguments: $($parsedCmd.Arguments | Out-String)" debug
+        Out-Message "Flags: $($parsedCmd.Flags | Out-String)" debug
     }
     
     $commandsDir = Join-Path $PSScriptRoot "Commands"
-    $commandPath = Get-CommandPath -CommandsDir $commandsDir -Command $Command -SubCommands $args.Subcommands
+    $commandPath = Get-CommandPath -CommandsDir $commandsDir -Command $Command -SubCommands $parsedCmd.Subcommands
     if (-not $commandPath) {
         Out-Message "'$Command $AdditionalArgs' ist kein gültiger Befehl."
         Use-MentionHelp

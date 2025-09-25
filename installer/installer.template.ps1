@@ -45,6 +45,7 @@ function Write-EnvFile {
 RELEASES_URL=$ReleasesUrl
 VERSION=$releaseVersion
 CT_SUBDOMAIN=__CT_SUBDOMAIN__
+YT_STREAM_URL=__YT_STREAM_URL__
 GH_TOKEN=$GitHubToken
 "@
     Set-Content -Path $EnvFile -Value $content -Encoding UTF8
