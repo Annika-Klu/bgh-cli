@@ -9,13 +9,14 @@ permissions:
   contents: write
 
 env:
-  RELEASES_URL: https://api.github.com/repos/${{ github.repository }}/releases
-  PUBLISHER_NAME: ${{ vars.PUBLISHER_NAME }}
-  PUBLISHER_URL: ${{ vars.PUBLISHER_URL }}
-  PUBLISHER_EMAIL: ${{ vars.PUBLISHER_EMAIL }}
   CT_SUBDOMAIN: ${{ vars.CT_SUBDOMAIN }}
   GH_TOKEN_TO_CHECK_RELEASES: ${{ secrets.GH_TOKEN }}
+  PUBLISHER_EMAIL: ${{ vars.PUBLISHER_EMAIL }}
+  PUBLISHER_NAME: ${{ vars.PUBLISHER_NAME }}
+  PUBLISHER_URL: ${{ vars.PUBLISHER_URL }}
   RELEASE_TAG: ${{ github.event.release.tag_name || 'v0.0.0' }}
+  RELEASES_URL: https://api.github.com/repos/${{ github.repository }}/releases
+  YT_STREAM_URL: ${{ vars.YT_STREAM_URL }}
 
 jobs:
   build-installer:
@@ -41,7 +42,8 @@ jobs:
           $script = $template -replace '__RELEASES_URL__', $env:RELEASES_URL `
                               -replace '__RELEASE_TAG__', $env:RELEASE_TAG `
                               -replace '__CT_SUBDOMAIN__', $env:CT_SUBDOMAIN `
-                              -replace '__GH_TOKEN__', $env:GH_TOKEN_TO_CHECK_RELEASES
+                              -replace '__GH_TOKEN__', $env:GH_TOKEN_TO_CHECK_RELEASES `
+                              -replace '__YT_STREAM_URL__', $env:YT_STREAM_URL
           $script | Set-Content installer/installer.ps1 -Encoding UTF8
 
       - name: Copy GitHub.psm1 module to installer
