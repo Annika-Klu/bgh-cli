@@ -19,7 +19,7 @@ function Start-TechnikNotebook {
     if (Test-Path $downloadFilesDir) {
         Remove-Item "$downloadFilesDir\*" -Recurse -Force
     } else {
-        New-Item -ItemType Directory -Path $downloadFilesDir
+        New-Item -ItemType Directory -Path $downloadFilesDir | Out-Null
     }
 
     $pptToday = $null

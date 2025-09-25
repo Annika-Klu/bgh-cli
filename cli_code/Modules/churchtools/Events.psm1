@@ -1,5 +1,3 @@
-$ct = [ChurchTools]::new($CT_API_URL)
-
 function Get-ApiDate {
     param(
         [datetime]$Date
@@ -14,6 +12,7 @@ function Save-EventFiles {
     )
     $nextDay = $ForDate.AddDays(1)
     $eventsUrl = "events?include=eventServices&from=$(Get-ApiDate $ForDate)&to=$(Get-ApiDate $nextDay)"
+    $ct = [ChurchTools]::new($CT_API_URL)
     $events = $ct.CallApi("GET", $eventsUrl, $null, $null)
     if (-not $events.data) {
         return @()
