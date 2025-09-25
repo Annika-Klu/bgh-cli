@@ -7,7 +7,7 @@ function Start-OBS {
     }
 }
 
-function Start-WinEdge {
+function Start-MSEdge {
     param(
         [string]$OpenUrl
     )

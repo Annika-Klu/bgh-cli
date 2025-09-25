@@ -70,7 +70,7 @@ function Start-TechnikPC {
         $toast.Show("error", "OBS", $_)
     }
     try {
-        Start-MsEdge -OpenUrl $YT_STREAM_URL
+        Start-MSEdge -OpenUrl $YT_STREAM_URL
     } catch {
         $toast.Show("error", "Microsoft Edge", $_)
     }
