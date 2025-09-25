@@ -6,7 +6,7 @@ param (
 
 Set-Location -Path $PSScriptRoot
 
-. "$PSScriptRoot/preflight/run.ps1"
+. "$PSScriptRoot/preflight/run.ps1" -Command $Command
 
 function Use-MentionHelp {
     Out-Message "Mit 'bgh hilfe' kannst du eine Liste aller Befehle anzeigen lassen."

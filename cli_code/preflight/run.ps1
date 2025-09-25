@@ -1,3 +1,7 @@
+param(
+    [string]$Command
+)
+
 . "$PSScriptRoot/loadClassesAndModules.ps1"
 . "$PSScriptRoot/installRequirements.ps1"
 
@@ -43,7 +47,7 @@ try {
     Get-DotEnv
     Set-Encoding
     Test-PSVersion
-    Test-CliVersion
+    if ($Command -ne "update") { Test-CliVersion }
 } catch {
     $log.Write("ERROR in preflight/run.ps1: $($_.Exception.Message)")
 }
