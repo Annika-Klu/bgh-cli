@@ -1,30 +1,29 @@
-
-function Get-AllSongFiles {
+function Get-ChurchtoolsSongFiles {
     $ct = [ChurchTools]::new($CT_API_URL)
     $songs = $ct.PaginateRequest("songs", 100)
-    $songFiles = @()
+    $CtSongFiles = @()
     
     foreach ($song in $songs) {
         foreach ($arragement in $song.arrangements) {
             $pptFiles = $arragement.files | Where-Object { $_.name.Contains(".pptx")}
             if ($pptFiles) {
-                $songFiles = $songFiles + $pptFiles
+                $CtSongFiles = $CtSongFiles + $pptFiles
             }
         }
     }
-    return $songFiles
+    return $CtSongFiles
 }
 
-function Revoke-SongFilesNotFound {
+function Revoke-SongFilesNotInChurchtools {
     param(
-        [array]$ApiSongFiles,
+        [array]$CtSongFiles,
         [string]$SongsDir
     )
 
     $existingFiles = Get-ChildItem -Path $SongsDir -File
     $filesToDelete = $existingFiles | Where-Object {
         $file = $_
-        -not ($ApiSongFiles | Where-Object { $file.name -eq $_.Name })
+        -not ($CtSongFiles | Where-Object { $file.name -eq $_.Name })
     }
     foreach ($file in $filesToDelete) {
         Remove-Item $file.FullName -Force
@@ -32,9 +31,9 @@ function Revoke-SongFilesNotFound {
     return $filesToDelete.Count
 }
 
-function Sync-FromLocalToChurchtools {
+function Sync-FromChurchtoolsToLocal {
     param(
-        [array]$SongFiles,
+        [array]$CtSongFiles,
         [string]$SongsDir
     )
     
@@ -44,14 +43,14 @@ function Sync-FromLocalToChurchtools {
 
     $ct = [ChurchTools]::new($CT_API_URL)
     $stats = @{
-        "total" = $songFiles.Count
+        "total" = $CtSongFiles.Count
         "new" = 0
         "updated" = 0
     }
 
-    $stats["deleted"] = Revoke-SongFilesNotFound -ApiSongFiles $SongFiles -SongsDir $SongsDir
+    $stats["deleted"] = Revoke-SongFilesNotInChurchtools -CtSongFiles $CtSongFiles -SongsDir $SongsDir
     
-    foreach ($file in $SongFiles) {
+    foreach ($file in $CtSongFiles) {
         $savePath = Join-Path $SongsDir $file.name
         if (Test-path $savePath) {
             $lastModifiedDateStr = $file.meta.modifiedDate

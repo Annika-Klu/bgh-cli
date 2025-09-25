@@ -24,12 +24,12 @@ try {
     Assert-SyncArg -Key "von" -Value $from
     Assert-SyncArg -Key "nach" -Value $to
 
-    $songFiles = Get-AllSongFiles
-    Out-Message "$($songFiles.Count) Lieddateien gefunden."
+    $ctSongFiles = Get-ChurchtoolsSongFiles
+    Out-Message "$($ctSongFiles.Count) Lieddateien gefunden."
     $songsDir = Join-Path $OUT_DIR "Lieder"
-    
+
     if ($from -eq "churchtools" -and $to -eq "lokal") {
-       $stats = Sync-FromLocalToChurchtools -SongFiles $songFiles -SongsDir $songsDir
+       $stats = Sync-FromChurchtoolsToLocal -CtSongFiles $ctSongFiles -SongsDir $songsDir
     } else {
         Out-Message "Sync von $from nach $to folgt noch. Hier ist Vorsicht geboten, da Churchtools die zentrale Datenquelle ist."
         exit 0
