@@ -11,7 +11,7 @@ function Save-EventFiles {
     $eventsUrl = "events?include=eventServices&from=$todayStr&to=$tomorrowStr"
     $events = $ct.CallApi("GET", $eventsUrl, $null, $null)
     if (-not $events) {
-        throw "Heute sind keine Veranstaltungen in Churchtools geplant. Keine Dateien heruntergeladen."
+        return @()
     }
    
     foreach ($event in $events) {
