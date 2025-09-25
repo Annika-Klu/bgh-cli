@@ -39,9 +39,28 @@ class ChurchTools {
             return $OutFile
         } else {
             $response = Invoke-WebRequest @params
-            $json = $response.Content | ConvertFrom-Json
-            return $json.data
+            return $response.Content | ConvertFrom-Json
         }
+    }
+
+    [object] PaginateRequest([string]$Path, [int]$Limit) {
+        $allData = @()
+        $pagination = @{
+            "current" = 1
+            "lastPage"  = 9999
+            "limit" = $Limit
+        }
+        
+        do {
+            $url = "$($Path)?direction=forward&page=$($pagination['current'])&limit=$Limit"
+            $response = $this.CallApi("GET", $url, $null, $null)
+            $allData += $response.data
+            if ($pagination['lastPage'] -ne $response.meta.pagination.lastPage) {
+                $pagination['lastPage'] = $response.meta.pagination.lastPage
+            }
+            $pagination['current']++
+        } while ($pagination['current'] -le $pagination['lastPage'])
+        return $allData
     }
 
     [void] LoadUserData() {
@@ -50,14 +69,14 @@ class ChurchTools {
         } else {
             try {
                 Out-Message "Lade Nutzerdaten..."
-                $userData = $this.CallApi("GET", "whoami", $null, $null)
+                $userRes = $this.CallApi("GET", "whoami", $null, $null)
                 # to do: identify CLI group and if user is not a member, add them. Separate method.
-                $groups = $this.CallApi("GET", "persons/$($userData.id)/groups", $null, $null)
+                $groups = $this.CallApi("GET", "persons/$($userRes.data.id)/groups", $null, $null)
                 $this.User = [PSCustomObject]@{
-                    firstName   = $userData.firstName
-                    lastName = $userData.lastName
-                    email  = $userData.email
-                    groups = $groups | ForEach-Object { $_.group.domainIdentifier }
+                    firstName   = $userRes.data.firstName
+                    lastName = $userRes.data.lastName
+                    email  = $userRes.data.email
+                    groups = $groups.data | ForEach-Object { $_.group.domainIdentifier }
                 }
                 $this.CacheUserData()
             } catch {

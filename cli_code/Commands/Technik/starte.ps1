@@ -1,4 +1,3 @@
-$ct = [ChurchTools]::new($CT_API_URL)
 $toast = [Toast]::new()
 
 $device = $null
@@ -16,11 +15,11 @@ function Assert-DeviceArg {
 }
 
 function Start-TechnikNotebook {
-    $downloadFilesDir = Join-Path $env:USERPROFILE "Desktop/Churchtools_Downloads"
+    $downloadFilesDir = Join-Path $OUT_DIR "Eventdateien"
     if (Test-Path $downloadFilesDir) {
         Remove-Item "$downloadFilesDir\*" -Recurse -Force
     } else {
-        New-Item -ItemType Directory -Path $downloadFilesDir
+        New-Item -ItemType Directory -Path $downloadFilesDir | Out-Null
     }
 
     $pptToday = $null
@@ -87,7 +86,7 @@ try {
         }
     }
 } catch {
-    Write-Host $_
+    Out-Message $_ -Type "error"
     $ToastTitle = "Technikstart"
     if ($device) { $ToastTitle += " (auf $device)"}
     $toast.Show("error", $ToastTitle, $_)
