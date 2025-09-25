@@ -20,10 +20,21 @@ function Assert-SyncArg {
     }
 }
 
-function Sync-FromLocalToChurchtools {
+try {
+    Assert-SyncArg -Key "von" -Value $from
+    Assert-SyncArg -Key "nach" -Value $to
+
     $songFiles = Get-AllSongFiles
     Out-Message "$($songFiles.Count) Lieddateien gefunden."
-    $stats = Sync-SongFiles -SongFiles $songFiles
+    $songsDir = Join-Path $OUT_DIR "Lieder"
+    
+    if ($from -eq "churchtools" -and $to -eq "lokal") {
+       $stats = Sync-FromLocalToChurchtools -SongFiles $songFiles -SongsDir $songsDir
+    } else {
+        Out-Message "Sync von $from nach $to folgt noch. Hier ist Vorsicht geboten, da Churchtools die zentrale Datenquelle ist."
+        exit 0
+    }
+
     $newSongs = $stats.new
     $updatedSongs = $stats.updated
     $deletedSongs = $stats.deleted
@@ -32,14 +43,6 @@ function Sync-FromLocalToChurchtools {
         $toast.Show("info", "Lieder-Sync von $from nach $to", "Alle Dateien sind aktuell.")
     } else {
         $toast.Show("info", "Lieder-Sync von $from nach $to", "$processedSongs Verarbeitete Datei(en): $newSongs neu, $updatedSongs aktualisert, $deletedSongs entfernt.")
-    }
-}
-
-try {
-    Assert-SyncArg -Key "von" -Value $from
-    Assert-SyncArg -Key "nach" -Value $to
-    if ($from -eq "churchtools" -and $to -eq "lokal") {
-        Sync-FromLocalToChurchtools
     }
 } catch {
     Out-Message $_ -Type "error"    

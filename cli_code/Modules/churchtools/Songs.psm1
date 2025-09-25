@@ -21,7 +21,7 @@ function Revoke-SongFilesNotFound {
         [string]$SongsDir
     )
 
-    $existingFiles = Get-ChildItem -Path $songsDir -File
+    $existingFiles = Get-ChildItem -Path $SongsDir -File
     $filesToDelete = $existingFiles | Where-Object {
         $file = $_
         -not ($ApiSongFiles | Where-Object { $file.name -eq $_.Name })
@@ -32,13 +32,14 @@ function Revoke-SongFilesNotFound {
     return $filesToDelete.Count
 }
 
-function Sync-SongFiles {
+function Sync-FromLocalToChurchtools {
     param(
-        [array]$SongFiles
+        [array]$SongFiles,
+        [string]$SongsDir
     )
-    $songsDir = Join-Path $OUT_DIR "Lieder"
-    if (-not (Test-Path $songsDir)) {
-        New-Item -ItemType Directory -Path $songsDir | Out-Null
+    
+    if (-not (Test-Path $SongsDir)) {
+        New-Item -ItemType Directory -Path $SongsDir | Out-Null
     }
 
     $ct = [ChurchTools]::new($CT_API_URL)
@@ -48,10 +49,10 @@ function Sync-SongFiles {
         "updated" = 0
     }
 
-    $stats["deleted"] = Revoke-SongFilesNotFound -ApiSongFiles $SongFiles -SongsDir $songsDir
+    $stats["deleted"] = Revoke-SongFilesNotFound -ApiSongFiles $SongFiles -SongsDir $SongsDir
     
     foreach ($file in $SongFiles) {
-        $savePath = Join-Path $songsDir $file.name
+        $savePath = Join-Path $SongsDir $file.name
         if (Test-path $savePath) {
             $lastModifiedDateStr = $file.meta.modifiedDate
             $apiFileLastModified = [DateTime]::ParseExact($lastModifiedDateStr, "yyyy-MM-ddTHH:mm:ssZ", $null)
