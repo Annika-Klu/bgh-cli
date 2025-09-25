@@ -43,6 +43,26 @@ class ChurchTools {
         }
     }
 
+    [object] PaginateRequest([string]$Path, [int]$Limit) {
+        $allData = @()
+        $pagination = @{
+            "current" = 1
+            "lastPage"  = 9999
+            "limit" = $Limit
+        }
+        
+        do {
+            $url = "$($Path)?direction=forward&page=$($pagination['current'])&limit=$Limit"
+            $response = $this.CallApi("GET", $url, $null, $null)
+            $allData += $response.data
+            if ($pagination['lastPage'] -ne $response.meta.pagination.lastPage) {
+                $pagination['lastPage'] = $response.meta.pagination.lastPage
+            }
+            $pagination['current']++
+        } while ($pagination['current'] -le $pagination['lastPage'])
+        return $allData
+    }
+
     [void] LoadUserData() {
         if (Test-Path -Path $this.CachePath) {
             $this.User = Get-Content $this.CachePath -Raw | ConvertFrom-Json
