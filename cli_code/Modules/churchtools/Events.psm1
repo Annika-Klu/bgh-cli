@@ -15,11 +15,11 @@ function Save-EventFiles {
     $nextDay = $ForDate.AddDays(1)
     $eventsUrl = "events?include=eventServices&from=$(Get-ApiDate $ForDate)&to=$(Get-ApiDate $nextDay)"
     $events = $ct.CallApi("GET", $eventsUrl, $null, $null)
-    if (-not $events) {
+    if (-not $events.data) {
         return @()
     }
    
-    foreach ($event in $events) {
+    foreach ($event in $events.data) {
         $files = $event.eventFiles
         if (-not $files) { continue }
         foreach ($file in $files) {

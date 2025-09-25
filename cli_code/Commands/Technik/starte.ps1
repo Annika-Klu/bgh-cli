@@ -1,4 +1,3 @@
-$ct = [ChurchTools]::new($CT_API_URL)
 $toast = [Toast]::new()
 
 $device = $null
@@ -87,7 +86,7 @@ try {
         }
     }
 } catch {
-    Write-Host $_
+    Out-Message $_ -Type "error"
     $ToastTitle = "Technikstart"
     if ($device) { $ToastTitle += " (auf $device)"}
     $toast.Show("error", $ToastTitle, $_)
