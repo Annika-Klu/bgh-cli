@@ -23,16 +23,32 @@ function Start-TechnikNotebook {
         New-Item -ItemType Directory -Path $downloadFilesDir
     }
 
+    $pptToday = $null
     try {
         $downloadedFiles = Save-EventFiles -SaveDir $downloadFilesDir
         $downloadedTotal = $downloadedFiles.Count
+
         if ($downloadedTotal -eq 0) {
             $toast.Show("info", "Downloads", "Heute sind keine Veranstaltungen geplant oder es gibt keine Dateien dafür.")
         } else {
             $toast.Show("info", "Downloads", "$downloadedTotal Dateien für heutige Veranstaltung(en) heruntergeladen.")
+            $pptFiles = $downloadedFiles | Where-Object { $_.Name -like "*.pptx" }
+            if ($pptFiles.Count -gt 1) {
+                $toast.Show("info", "Mehrere PowerPoint-Dateien geladen", "Bitte im Download-Ordner schauen, welche geöffnet werden soll.")
+            } else {
+                $pptToday = $pptFiles[0]
+            }
         }
     } catch {
         $toast.Show("error", "Downloads", $_)
+    }
+
+    if ($pptToday) {
+        try {
+            Start-Process $pptToday.FullName
+        } catch {
+            $toast.Show("error", "Öffnen der PowerPoint-Datei", $_)
+        }
     }
 
     try {
