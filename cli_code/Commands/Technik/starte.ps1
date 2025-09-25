@@ -16,7 +16,7 @@ function Assert-DeviceArg {
 }
 
 function Start-TechnikNotebook {
-    $downloadFilesDir = Join-Path $env:USERPROFILE "Desktop/Churchtools_Downloads"
+    $downloadFilesDir = Join-Path $OUT_DIR "Eventdateien"
     if (Test-Path $downloadFilesDir) {
         Remove-Item "$downloadFilesDir\*" -Recurse -Force
     } else {
