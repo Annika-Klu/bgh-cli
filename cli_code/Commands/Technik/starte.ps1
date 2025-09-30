@@ -86,6 +86,7 @@ try {
         }
     }
 } catch {
+    Write-ErrorMessage -Log $log -ErrMsg $_.Exception.Message
     if ($parsedCmd.Flags.job) {
         $ToastTitle = "Technikstart"
         if ($device) { $ToastTitle += " (auf $device)"}
@@ -93,5 +94,5 @@ try {
         exit 0
     } 
     Out-Message $_ -Type "error"
-    Write-ErrorReport -Log $log -ErrMsg $_.Exception.Message
+    Send-ErrorReport -ErrMsg $_.Exception.Message
 }

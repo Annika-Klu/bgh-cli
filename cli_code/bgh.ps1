@@ -52,6 +52,7 @@ try {
 
     exit 0
 } catch {
-    Out-Message $_ error
-    Write-ErrorReport -Log $log -ErrMsg $_.Exception.Message
+    Out-Message $_.Exception.Message -Type "error"
+    Write-ErrorMessage -Log $log -ErrMsg $_.Exception.Message
+    Send-ErrorReport -ErrMsg $_.Exception.Message
 }

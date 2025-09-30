@@ -12,5 +12,6 @@ try {
         exit 0
     }
 } catch {
-    Write-ErrorReport -Log $log -ErrMsg $_.Exception.Message
+    Write-ErrorMessage -Log $log -ErrMsg $_.Exception.Message
+    Send-ErrorReport -ErrMsg $_.Exception.Message
 }
