@@ -19,6 +19,8 @@ try {
         exit 1
     }
 
+    Set-Variable -Name "BASE_CMD" -Value $Command -Scope Global
+
     $parsedCmd = @{}
     if ($AdditionalArgs.Count -gt 0) {
         $parsedCmdStr = $AdditionalArgs -join " "
