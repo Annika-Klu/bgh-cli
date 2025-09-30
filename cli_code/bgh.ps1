@@ -46,8 +46,7 @@ try {
     $ct = [ChurchTools]::new($CT_API_URL)
 
     if ($allowedCommands.FullName -notcontains $commandPath) {
-        Out-Message "Du bist nicht berechtigt, diesen Befehl auszuführen." -Type error
-        throw "User $($ct.User.email) is not allowed to run command '$Command'."
+        throw "User $($ct.User.firstName) $($ct.User.lastName) ist nicht berechtigt, den Befehl '$Command' auszuführen."
     }
     . $commandPath @($AdditionalArgs)
 

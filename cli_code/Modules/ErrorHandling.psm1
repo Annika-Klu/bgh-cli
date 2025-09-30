@@ -6,8 +6,8 @@ function Write-ErrorReport {
     $groupName = "CLI"
 
     $logMsg = if ($parsedCmd.Subcommands) { 
-        "ERROR in '$BASE_CMD $($parsedCmd.Subcommands)': $ErrMsg" }
-    else { "ERROR in '$BASE_CMD': $ErrMsg" }
+        "FEHLER bei '$BASE_CMD $($parsedCmd.Subcommands)': $ErrMsg" }
+    else { "FEHLER bei '$BASE_CMD': $ErrMsg" }
 
     $Log.Write($logMsg)
 
