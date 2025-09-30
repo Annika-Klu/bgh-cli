@@ -90,10 +90,14 @@ class ChurchTools {
         $this.User | ConvertTo-Json | Set-Content -Path $this.CachePath
     }
 
-    [string] AddUserToCLIGroup($CliVersion) {
+    [pscustomobject] FindGroup($GroupName) {
         $groups = $this.PaginateRequest("groups", 50)
+        return $groups | Where-Object { $_.name -eq $GroupName }
+    }
+
+    [string] AddUserToCLIGroup($CliVersion) {
         $groupName = "CLI"
-        $cliGroup = $groups | Where-Object { $_.name -eq $groupName }
+        $cliGroup = $this.FindGroup($groupName)
         if (-not $cliGroup) { return "Gruppe '$groupName' nicht gefunden." }
         if ($cliGroup.id -in $this.User.groups) {
             return "In der Gruppe '$groupName' kannst du Fragen stellen oder Fehler melden."
