@@ -4,7 +4,12 @@ function Write-ErrorReport {
         [string]$ErrMsg
     )
     $groupName = "CLI"
-    $Log.Write("ERROR in $BASE_CMD $ErrMsg")
+
+    $logMsg = if ($parsedCmd.Subcommands) { 
+        "ERROR in '$BASE_CMD $($parsedCmd.Subcommands)': $ErrMsg" }
+    else { "ERROR in '$BASE_CMD': $ErrMsg" }
+
+    $Log.Write($logMsg)
 
     do {
         $choice = Read-Host "Möchtest du den Fehler in der Gruppe '$groupName' melden? (j, sonst weiter mit Enter, dann wird Fehlermeldung nur geloggt)"
