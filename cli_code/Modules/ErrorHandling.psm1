@@ -11,13 +11,18 @@ function Write-ErrorReport {
 
     $Log.Write($logMsg)
 
+    Out-Message "Falls der Fehler häufiger auftritt und du nicht weiterkommst, kannst du ihn in der Gruppe '$groupName' melden." -Type "debug"
     do {
-        $choice = Read-Host "Möchtest du den Fehler in der Gruppe '$groupName' melden? (j, sonst weiter mit Enter, dann wird Fehlermeldung nur geloggt)"
+        $choice = Read-Host "Fehler melden? (j, sonst beenden mit Enter)"
     } while ($choice -ne "j" -and $choice -ne "")
     
     if (-not $choice) { return }
 
     $ct = [ChurchTools]::new($CT_API_URL)
+    if (-not $ct) {
+        Out-Message "Churchtools ist nicht verfügbar." -Type "error"
+        return
+    }
     
     $content = "Fehlermeldung: '$ErrMsg'"
     $additionalInfo = Read-Host "Beschreibung zusätzlich zur Fehlermeldung (optional, sonst weiter mit Enter):"
