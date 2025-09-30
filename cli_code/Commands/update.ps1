@@ -12,5 +12,5 @@ try {
         exit 0
     }
 } catch {
-    $log.Write("ERROR in update.ps1 $($_.Exception.Message)")
+    Write-ErrorReport -Log $log -ErrMsg $_.Exception.Message
 }

@@ -54,5 +54,5 @@ try {
     exit 0
 } catch {
     Out-Message $_ error
-    $log.Write("Error in bgh.ps1 $($_.Exception.Message)")
+    Write-ErrorReport -Log $log -ErrMsg $_.Exception.Message
 }

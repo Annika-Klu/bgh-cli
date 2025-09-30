@@ -86,8 +86,12 @@ try {
         }
     }
 } catch {
+    if ($parsedCmd.Flags.job) {
+        $ToastTitle = "Technikstart"
+        if ($device) { $ToastTitle += " (auf $device)"}
+        $toast.Show("error", $ToastTitle, $_)
+        exit 0
+    } 
     Out-Message $_ -Type "error"
-    $ToastTitle = "Technikstart"
-    if ($device) { $ToastTitle += " (auf $device)"}
-    $toast.Show("error", $ToastTitle, $_)
+    Write-ErrorReport -Log $log -ErrMsg $_.Exception.Message
 }

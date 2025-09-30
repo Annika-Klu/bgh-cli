@@ -7,5 +7,5 @@ try {
     Out-Message "Email: $($ct.User.email)"
     Out-Line
 } catch {
-    $log.Write("ERROR in info.ps1 $($_.Exception.Message)")
+    Write-ErrorReport -Log $log -ErrMsg $_.Exception.Message
 }

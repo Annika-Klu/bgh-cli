@@ -45,6 +45,10 @@ try {
         $toast.Show("info", "Lieder-Sync von $from nach $to", "$processedSongs Verarbeitete Datei(en): $newSongs neu, $updatedSongs aktualisert, $deletedSongs entfernt.")
     }
 } catch {
-    Out-Message $_ -Type "error"    
-    $toast.Show("error", "Lieder-Sync", $_)
+    if ($parsedCmd.Flags.job) {
+        $toast.Show("error", "Lieder-Sync", $_)
+        exit 0
+    } 
+    Out-Message $_ -Type "error"
+    Write-ErrorReport -Log $log -ErrMsg $_.Exception.Message
 }
