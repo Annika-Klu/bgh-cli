@@ -71,6 +71,16 @@ Für die Ersteinrichtung brauchst du dein Churchtools-Login-Token. Um es zu find
 - Bestätige mit Eingabetaste.
 "@
 
+function Show-UserAndAddToGroup {
+    param(
+        [string]$ApiUrl
+    )
+    $ct = [ChurchTools]::new($ApiUrl)
+    Out-Message "Authentifiziert als $($ct.User.firstName) $($ct.User.lastName)"
+    $groupSignUpresult = $ct.AddUserToCLIGroup($VERSION)
+    Out-Message $groupSignUpresult
+}
+
 function Set-CliEnv {
     Out-Line
     Out-Message  "Willkommen zum BGH-CLI!"
@@ -82,11 +92,8 @@ function Set-CliEnv {
     Save-ApiToken -ApiUrl $envVars["CT_API_URL"]
     $envVars["OUT_DIR"] = Set-OutDir
     Update-DotEnv -KeyValuePairs $envVars
-    $ct = [ChurchTools]::new($envVars["CT_API_URL"])
-    Out-Message "Authentifiziert als $($ct.User.firstName) $($ct.User.lastName)"
-    $groupSignUpresult = $ct.AddUserToCLIGroup($VERSION)
-    Out-Message $groupSignUpresult
+    Show-UserAndAddToGroup -ApiUrl $envVars["CT_API_URL"]
     Out-Message "Danke für deine Angaben! Das CLI ist jetzt fertig konfiguriert."
 }
 
-Export-ModuleMember -Function Set-CliEnv
+Export-ModuleMember -Function Set-CliEnv, Save-ApiToken, Show-UserAndAddToGroup
