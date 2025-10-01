@@ -35,11 +35,8 @@ function Save-ApiToken {
     )
     do {
         try {
-            Write-Host ""
             $pastedToken = Read-Host "Bitte gib dein Login-Token ein"
             Save-EncryptedToken -Token $pastedToken -Path (Join-Path $PWD "ctlogintoken.sec")
-            $ct = [ChurchTools]::new($ApiUrl)
-            Out-Message "Authentifiziert als $($ct.User.firstName) $($ct.User.lastName)"
             $isValid = $true
         } catch {
             Out-Message "Das Token ist ungültig. $_" error
@@ -70,7 +67,7 @@ Für die Ersteinrichtung brauchst du dein Churchtools-Login-Token. Um es zu find
 - suche in Churchtools unter 'Personen' deinen eigenen Datensatz und klicke ihn an.
 - Klicke auf 'Berechtigungen'. 
 - Im dann angezeigten Fenseter klicke auf 'Login-Token' und kopiere das angezeigte Token (Strg + C ist am einfachsten).
-- Wenn das CLI dich auffordert, gib dein Token ein. Bei Rechtsklick in die Powershell-Konsole werden kopierte Inhalte eingefügt.
+- Wenn das CLI dich auffordert, gib dein Token ein. Per Rechtsklick in die Powershell-Konsole werden kopierte Inhalte eingefügt.
 - Bestätige mit Eingabetaste.
 "@
 
@@ -85,6 +82,10 @@ function Set-CliEnv {
     Save-ApiToken -ApiUrl $envVars["CT_API_URL"]
     $envVars["OUT_DIR"] = Set-OutDir
     Update-DotEnv -KeyValuePairs $envVars
+    $ct = [ChurchTools]::new($envVars["CT_API_URL"])
+    Out-Message "Authentifiziert als $($ct.User.firstName) $($ct.User.lastName)"
+    $groupSignUpresult = $ct.AddUserToCLIGroup($VERSION)
+    Out-Message $groupSignUpresult
     Out-Message "Danke für deine Angaben! Das CLI ist jetzt fertig konfiguriert."
 }
 

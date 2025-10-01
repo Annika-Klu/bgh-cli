@@ -19,6 +19,8 @@ try {
         exit 1
     }
 
+    Set-Variable -Name "BASE_CMD" -Value $Command -Scope Global
+
     $parsedCmd = @{}
     if ($AdditionalArgs.Count -gt 0) {
         $parsedCmdStr = $AdditionalArgs -join " "
@@ -44,13 +46,13 @@ try {
     $ct = [ChurchTools]::new($CT_API_URL)
 
     if ($allowedCommands.FullName -notcontains $commandPath) {
-        Out-Message "Du bist nicht berechtigt, diesen Befehl auszuführen." -Type error
-        throw "User $($ct.User.email) is not allowed to run command '$Command'."
+        throw "User $($ct.User.firstName) $($ct.User.lastName) ist nicht berechtigt, den Befehl '$Command' auszuführen."
     }
     . $commandPath @($AdditionalArgs)
 
     exit 0
 } catch {
-    Out-Message $_ error
-    $log.Write("Error in bgh.ps1 $($_.Exception.Message)")
+    Out-Message $_.Exception.Message -Type "error"
+    Write-ErrorMessage -Log $log -ErrMsg $_.Exception.Message
+    Send-ErrorReport -ErrMsg $_.Exception.Message
 }

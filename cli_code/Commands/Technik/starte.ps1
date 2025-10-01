@@ -4,12 +4,12 @@ $device = $null
 $validDevices = @("pc", "notebook")
 
 function Assert-DeviceArg {
-    if (-not $parsedCmd.Arguments -or (-not $parsedCmd.Arguments.ContainsKey("device"))) {
-        throw "Pflichtargument 'device' (pc oder notebook) fehlt"
+    if (-not $parsedCmd.Arguments -or (-not $parsedCmd.Arguments.ContainsKey("auf"))) {
+        throw "Pflichtargument 'auf' (pc oder notebook) fehlt"
     }
-    $device = $parsedCmd.Arguments.device
+    $device = $parsedCmd.Arguments.auf
     if ($device -notin $validDevices) {
-        throw "Ungültiges Argument für 'device': $device"
+        throw "Ungültiges Argument für 'auf': $device"
     }
     return $device
 }
@@ -86,8 +86,13 @@ try {
         }
     }
 } catch {
+    Write-ErrorMessage -Log $log -ErrMsg $_.Exception.Message
+    if ($parsedCmd.Flags.job) {
+        $ToastTitle = "Technikstart"
+        if ($device) { $ToastTitle += " (auf $device)"}
+        $toast.Show("error", $ToastTitle, $_)
+        exit 0
+    } 
     Out-Message $_ -Type "error"
-    $ToastTitle = "Technikstart"
-    if ($device) { $ToastTitle += " (auf $device)"}
-    $toast.Show("error", $ToastTitle, $_)
+    Send-ErrorReport -ErrMsg $_.Exception.Message
 }

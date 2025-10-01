@@ -70,9 +70,9 @@ class ChurchTools {
             try {
                 Out-Message "Lade Nutzerdaten..."
                 $userRes = $this.CallApi("GET", "whoami", $null, $null)
-                # to do: identify CLI group and if user is not a member, add them. Separate method.
                 $groups = $this.CallApi("GET", "persons/$($userRes.data.id)/groups", $null, $null)
                 $this.User = [PSCustomObject]@{
+                    id = $userRes.data.id
                     firstName   = $userRes.data.firstName
                     lastName = $userRes.data.lastName
                     email  = $userRes.data.email
@@ -88,6 +88,27 @@ class ChurchTools {
 
     [void] CacheUserData() {
         $this.User | ConvertTo-Json | Set-Content -Path $this.CachePath
+    }
+
+    [pscustomobject] FindGroup($GroupName) {
+        $groups = $this.PaginateRequest("groups", 50)
+        return $groups | Where-Object { $_.name -eq $GroupName }
+    }
+
+    [string] AddUserToCLIGroup($CliVersion) {
+        $groupName = "CLI"
+        $cliGroup = $this.FindGroup($groupName)
+        if (-not $cliGroup) { return "Gruppe '$groupName' nicht gefunden." }
+        if ($cliGroup.id -in $this.User.groups) {
+            return "In der Gruppe '$groupName' kannst du Fragen stellen oder Fehler melden."
+        }
+        $body = @{
+	        "informLeader" = $true
+	        "comment" = "Anmeldung aus CLI ($CliVersion)"
+        }
+        $this.CallApi("PUT", "groups/$($cliGroup.id)/members/$($this.User.id)", $body, $null)
+        $this.LoadUserData()
+        return "Du bist jetzt Mitglied der Gruppe '$groupName'. Dort kannst du Fragen stellen oder Fehler melden."
     }
 
     [bool] UserHasAccess([string[]]$allowedGroups) {

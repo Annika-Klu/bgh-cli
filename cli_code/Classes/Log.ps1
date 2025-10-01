@@ -20,4 +20,5 @@ class Log {
     }
 }
 
-$log = [Log]::new("bgh")
+$timestamp = Get-Date -Format "yyyy-MM-dd"
+$log = [Log]::new("bgh-cli_$timestamp")

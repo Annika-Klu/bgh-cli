@@ -49,5 +49,6 @@ try {
     Test-PSVersion
     if ($Command -ne "update") { Test-CliVersion }
 } catch {
-    $log.Write("ERROR in preflight/run.ps1: $($_.Exception.Message)")
+    Write-ErrorMessage -Log $log -ErrMsg "ERROR in preflight run: $($_.Exception.Message)"
+    Out-Message "ACHTUNG: $($_.Exception.Message)"-Type "warning"
 }

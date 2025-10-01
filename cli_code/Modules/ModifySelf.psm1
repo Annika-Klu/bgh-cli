@@ -8,7 +8,7 @@ function Invoke-UpdateBootstrap {
     $KeepFilesDir = Join-Path $TempDir "keep"
     New-Item -ItemType Directory -Path $KeepFilesDir | Out-Null
     Out-Message "Sichere Dateien..."
-    $KeepFiles = @(".env", ".usercache.json")
+    $KeepFiles = @(".env", ".usercache.json", "ctlogintoken.sec")
     foreach ($file in $KeepFiles) {
         $originalPath = Join-Path $InstallPath $file
         if (Test-Path $originalPath) {
