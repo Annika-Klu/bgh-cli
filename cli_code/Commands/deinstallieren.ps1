@@ -8,7 +8,10 @@ try {
         return
     }
     $TempUpdateFilePath = Invoke-UninstallBootstrap
-    Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -NoExit -File `"$TempUpdateFilePath`" -InstallPath `"$PWD`""
+    Start-Process -FilePath "powershell.exe" `
+    -WorkingDirectory $env:TEMP `
+    -ArgumentList "-ExecutionPolicy Bypass -NoExit -File `"$TempUpdateFilePath`" -InstallPath `"$PWD`""
+
     Out-Message "Deinstallation vorbereitet."
     exit 0
 } catch {
