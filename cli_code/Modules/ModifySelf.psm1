@@ -50,4 +50,38 @@ function Register-UpdateWorker {
     }
 }
 
-Export-ModuleMember -Function Invoke-UpdateBootstrap, Register-UpdateWorker
+function Invoke-UninstallBootstrap {
+    $TempDir = Join-Path $env:TEMP "bgh-uninstall"
+    if (-not (Test-Path $TempDir)) {
+        New-Item -ItemType Directory -Path $TempDir | Out-Null
+    }
+    Write-Host "TempDirPath exists: $((Test-Path $TempDir))"
+    $TempUninstallFilePath = Join-Path $TempDir "uninstall.ps1"
+    $FunctionContent = (Get-Command 'Register-UninstallWorker').Definition
+    $FunctionContent | Out-File $TempUninstallFilePath
+
+    return $TempUninstallFilePath
+}
+
+function Register-UninstallWorker {
+    param(
+        [string]$InstallPath
+    )
+    $CmdShim = Join-Path $env:USERPROFILE "AppData\Local\Microsoft\WindowsApps\bgh.cmd"
+    try {
+        Write-Host "Entferne CLI-Code..." -ForegroundColor Green
+        Remove-Item -Path $InstallPath -Recurse -Force -ErrorAction Stop
+
+        if (Test-Path $CmdShim) {
+            Write-Host "Entferne Befehlsverknüpfung..." -ForegroundColor Green
+            Remove-Item -Path $CmdShim -Recurse -Force -ErrorAction Stop
+        }
+
+        Remove-Item -Path $PSScriptRoot -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Host "BGH-CLI erfolgreich deinstalliert." -ForegroundColor Green
+    } catch {
+        Write-Host $_.Exception.Message -ForegroundColor Red
+    }
+}
+
+Export-ModuleMember -Function Invoke-UpdateBootstrap, Register-UpdateWorker, Invoke-UninstallBootstrap, Register-UninstallWorker
