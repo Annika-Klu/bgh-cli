@@ -58,7 +58,7 @@ function Start-TechnikNotebook {
     try {
         Connect-BenQNetwork
     } catch {
-        $toast.Show("error", "Beamer (BenQ)", $_)
+        $toast.Show("error", "Netzwerk Beamer (BenQ)", $_)
     }
 }
 
