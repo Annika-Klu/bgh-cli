@@ -13,7 +13,7 @@ try {
     Set-Location $env:TEMP
     Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -NoExit -File `"$TempUpdateFilePath`" -InstallPath `"$cliInstallPath`""
 
-    Out-Message "Deinstallation vorbereitet."
+    Out-Message "Deinstallation vorbereitet. Deinstallationsskript in $TempUpdateFilePath gespeichert."
     exit 0
 } catch {
     Out-Message $_.Exception.Message -Type "error"
