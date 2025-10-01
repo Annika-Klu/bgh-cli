@@ -77,7 +77,7 @@ function Register-UninstallWorker {
             Remove-Item -Path $CmdShim -Recurse -Force -ErrorAction Stop
         }
 
-        Write-Host "Leere Deinstallationsverzeichnis $PSScriptRoot..."
+        Write-Host "Leere temporäres Deinstallationsverzeichnis $PSScriptRoot..."
         Remove-Item -Path $PSScriptRoot -Recurse -Force -ErrorAction SilentlyContinue
         Write-Host "BGH-CLI erfolgreich deinstalliert." -ForegroundColor Green
     } catch {
