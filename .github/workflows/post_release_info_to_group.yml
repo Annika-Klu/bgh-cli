@@ -35,6 +35,10 @@ jobs:
       
       - name: Post Release Information to Group via API
         run: |
+
+          TITLE="${{ env.TITLE }}"
+          BODY_HTML_LINE_BREAKS="${{ env.BODY_HTML_LINE_BREAKS }}"
+          
           curl -X POST "$CT_API_URL/posts" \
           -H "Authorization: Login $CT_LOGIN_TOKEN" \
           -H "Content-Type: application/json" \
