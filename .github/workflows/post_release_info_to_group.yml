@@ -19,15 +19,17 @@ jobs:
         uses: actions/checkout@v3
       
       - name: Get Release Information
-        id: get_release_info
         run: |
           echo "Will post"
-          echo "Release name: ${{ github.event.release.name }}"
           echo "Release tag: ${{ github.event.release.tag_name }}"
           echo "Release body: ${{ github.event.release.body }}"
-          echo "::set-output name=release_name::${{ github.event.release.name }}"
-          echo "::set-output name=release_tag::${{ github.event.release.tag_name }}"
-          echo "::set-output name=release_body::${{ github.event.release.body }}"
+
+          RELEASE_TAG="${{ github.event.release.tag_name }}"
+          TITLE="Neue Version $RELEASE_TAG"
+          RELEASE_BODY="${{ github.event.release.body }}"
+
+          echo "TITLE=$TITLE" >> $GITHUB_ENV
+          echo "RELEASE_BODY=$RELEASE_BODY" >> $GITHUB_ENV
       
       - name: Post Release Information to Group via API
         run: |
@@ -36,7 +38,7 @@ jobs:
           -H "Content-Type: application/json" \
           -d '{
             "groupId": "${{ secrets.CT_GROUP_ID }}",
-            "title": "Neuer Version ${{ steps.get_release_info.outputs.release_tag }}",
-            "content": "${{ steps.get_release_info.outputs.release_body }}",
+            "title": "$TITLE",
+            "content": "$RELEASE_BODY",
             "visibility": "group_intern"
           }'
