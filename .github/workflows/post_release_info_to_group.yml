@@ -42,9 +42,9 @@ jobs:
           curl -X POST "$CT_API_URL/posts" \
           -H "Authorization: Login $CT_LOGIN_TOKEN" \
           -H "Content-Type: application/json" \
-          -d '{
-            "groupId": "${{ secrets.CT_GROUP_ID }}",
-            "title": "$TITLE",
-            "content": "$BODY_HTML_LINE_BREAKS",
-            "visibility": "group_intern"
-          }'
+          -d "{
+            \"groupId\": \"${{ secrets.CT_GROUP_ID }}\",
+            \"title\": \"$TITLE\",
+            \"content\": \"$BODY_HTML_LINE_BREAKS\",
+            \"visibility\": \"group_intern\"
+          }"
