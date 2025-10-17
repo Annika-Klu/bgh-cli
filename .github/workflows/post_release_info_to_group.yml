@@ -18,7 +18,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
       
-      - name: Get Release Information
+      - name: Get Release Information and Post to Group via API
         run: |
           echo "Will post"
 
@@ -29,15 +29,6 @@ jobs:
           RELEASE_BODY="${{ github.event.release.body }}"
           BODY_HTML_LINE_BREAKS=$(echo "$RELEASE_BODY" | sed 's/\r\n/<br>/g' | sed 's/\n/<br>/g')
           echo "Content: $BODY_HTML_LINE_BREAKS"
-
-          echo "TITLE=$TITLE" >> $GITHUB_ENV
-          echo "BODY_HTML_LINE_BREAKS=$BODY_HTML_LINE_BREAKS" >> $GITHUB_ENV
-      
-      - name: Post Release Information to Group via API
-        run: |
-
-          TITLE="${{ env.TITLE }}"
-          BODY_HTML_LINE_BREAKS="${{ env.BODY_HTML_LINE_BREAKS }}"
           
           curl -X POST "$CT_API_URL/posts" \
           -H "Authorization: Login $CT_LOGIN_TOKEN" \
