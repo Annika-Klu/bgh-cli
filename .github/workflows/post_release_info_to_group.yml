@@ -1,0 +1,26 @@
+name: Post Release Info to CLI Group
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+env:
+  CT_LOGIN_TOKEN: ${{ secrets.CT_LOGIN_TOKEN }}
+  CT_API_URL: "https://${{ vars.CT_SUBDOMAIN }}.church.tools/api"
+
+jobs:
+  get-and-post-release-info:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      
+      - name: Get Release Information
+        id: get_release_info
+        run: |
+          echo "Release name: ${{ github.event.release.name }}"
+          echo "Release tag: ${{ github.event.release.tag_name }}"
+          echo "Release body: ${{ github.event.release.body }}"
+          echo "Release URL: ${{ github.event.release.html_url }}"
