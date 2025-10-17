@@ -32,7 +32,7 @@ jobs:
       - name: Post Release Information to Group via API
         run: |
           curl -X POST "$CT_API_URL/posts" \
-          -H "Authorization: LOGIN $CT_LOGIN_TOKEN" \
+          -H "Authorization: Login $CT_LOGIN_TOKEN" \
           -H "Content-Type: application/json" \
           -d '{
             "groupId": "${{ secrets.CT_GROUP_ID }}",
