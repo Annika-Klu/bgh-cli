@@ -21,15 +21,17 @@ jobs:
       - name: Get Release Information
         run: |
           echo "Will post"
-          echo "Release tag: ${{ github.event.release.tag_name }}"
-          echo "Release body: ${{ github.event.release.body }}"
 
           RELEASE_TAG="${{ github.event.release.tag_name }}"
           TITLE="Neue Version $RELEASE_TAG"
+          echo "Title: $TITLE"
+
           RELEASE_BODY="${{ github.event.release.body }}"
+          BODY_HTML_LINE_BREAKS=$(echo "$RELEASE_BODY" | sed 's/\r\n/<br>/g' | sed 's/\n/<br>/g')
+          echo "Content: $BODY_HTML_LINE_BREAKS"
 
           echo "TITLE=$TITLE" >> $GITHUB_ENV
-          echo "RELEASE_BODY=$RELEASE_BODY" >> $GITHUB_ENV
+          echo "BODY_HTML_LINE_BREAKS=$BODY_HTML_LINE_BREAKS" >> $GITHUB_ENV
       
       - name: Post Release Information to Group via API
         run: |
@@ -39,6 +41,6 @@ jobs:
           -d '{
             "groupId": "${{ secrets.CT_GROUP_ID }}",
             "title": "$TITLE",
-            "content": "$RELEASE_BODY",
+            "content": "$BODY_HTML_LINE_BREAKS",
             "visibility": "group_intern"
           }'
