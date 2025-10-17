@@ -8,6 +8,7 @@ on:
 env:
   CT_LOGIN_TOKEN: ${{ secrets.CT_LOGIN_TOKEN }}
   CT_API_URL: "https://${{ vars.CT_SUBDOMAIN }}.church.tools/api"
+  CT_GROUP_ID: ${{ secrets.CT_GROUP_ID }}
 
 jobs:
   get-and-post-release-info:
@@ -20,7 +21,22 @@ jobs:
       - name: Get Release Information
         id: get_release_info
         run: |
+          echo "Will post"
           echo "Release name: ${{ github.event.release.name }}"
           echo "Release tag: ${{ github.event.release.tag_name }}"
           echo "Release body: ${{ github.event.release.body }}"
-          echo "Release URL: ${{ github.event.release.html_url }}"
+          echo "::set-output name=release_name::${{ github.event.release.name }}"
+          echo "::set-output name=release_tag::${{ github.event.release.tag_name }}"
+          echo "::set-output name=release_body::${{ github.event.release.body }}"
+      
+      - name: Post Release Information to Group via API
+        run: |
+          curl -X POST "$CT_API_URL/posts" \
+          -H "Authorization: LOGIN $CT_LOGIN_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "groupId": "${{ secrets.CT_GROUP_ID }}",
+            "title": "Neuer Version ${{ steps.get_release_info.outputs.release_tag }}",
+            "content": "${{ steps.get_release_info.outputs.release_body }}",
+            "visibility": "group_intern"
+          }'
