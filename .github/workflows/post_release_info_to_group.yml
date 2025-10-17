@@ -2,7 +2,7 @@ name: Post Release Info to CLI Group
 
 on:
   release:
-    types: [published]
+    types: [published, edited]
   workflow_dispatch:
 
 env:
