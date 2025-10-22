@@ -17,6 +17,11 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+
+      - name: Install jq library
+        run: |
+          sudo apt-get update
+          sudo apt-get install jq -y
       
       - name: Get Release Information and Post to Group via API
         run: |
@@ -29,13 +34,19 @@ jobs:
           RELEASE_BODY="${{ github.event.release.body }}"
           BODY_HTML_LINE_BREAKS=$(echo "$RELEASE_BODY" | sed 's/\r\n/<br>/g' | sed 's/\n/<br>/g')
           echo "Content: $BODY_HTML_LINE_BREAKS"
-          
+
+          JSON_BODY=$(jq -n \
+            --arg groupId "${{ secrets.CT_GROUP_ID }}" \
+            --arg title "$TITLE" \
+            --arg content "$BODY_HTML_LINE_BREAKS" \
+            '{
+              groupId: $groupId,
+              title: $title,
+              content: $content,
+              visibility: "group_intern"
+            }')
+
           curl -X POST "$CT_API_URL/posts" \
           -H "Authorization: Login $CT_LOGIN_TOKEN" \
           -H "Content-Type: application/json" \
-          -d '{
-            "groupId": "${{ secrets.CT_GROUP_ID }}",
-            "title": "$TITLE",
-            "content": "$BODY_HTML_LINE_BREAKS",
-            "visibility": "group_intern"
-          }'
+          -d "$JSON_BODY"
