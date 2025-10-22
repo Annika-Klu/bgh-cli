@@ -37,9 +37,14 @@ function Test-AppointmentsValid {
 
         $tagmonatPattern = "^(?<_day>\d{2})\.(?<_month>\d{2})\.$"
         if ($appointment.PSObject.Properties.Name -contains "tagmonat") {
+            if ($appointment.PSObject.Properties.Name -contains "monatswoche") {
+                $contentValid = $false
+                Out-Message "Eintrag '$($appointment.name)': Wert 'monatswoche' gilt nur in Verbindung mit 'wochentag'. Unzulässig bei 'tagmonat'." -Type "error"
+            }
+
             if ($appointment.tagmonat -notmatch $tagmonatPattern) {
                 $contentValid = $false
-                Out-Message "Eintrag '$($appointment.name)' hat falschen Wert für 'tagmonat'. Format: 'dd.MM.'" -Type "error"
+                Out-Message "Eintrag '$($appointment.name)': Falscher Wert für 'tagmonat'. Format: 'dd.MM.'" -Type "error"
             } else {
                 $day = [int]$matches["_day"]
                 if ($day -lt 1 -or $day -gt 31) {

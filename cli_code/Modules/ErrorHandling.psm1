@@ -17,7 +17,7 @@ function Send-ErrorReport {
     }
     
     $content = "Fehlermeldung: '$ErrMsg'"
-    $additionalInfo = Read-Host "Beschreibung zusätzlich zur Fehlermeldung (optional, sonst weiter mit Enter):"
+    $additionalInfo = Read-Host "Beschreibung zusätzlich zur Fehlermeldung (optional, sonst weiter mit Enter)"
     if ($additionalInfo) { $content += " | Ergänzende Beschreibung: $additionalInfo" }
     
     $cliGroup = $ct.FindGroup($groupName)
