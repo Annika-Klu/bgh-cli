@@ -1,4 +1,4 @@
-function Get-StartEndDates {
+function Get-QuarterStartDate {
     param(
         [Int]$Quarter,
         [Int]$Year
@@ -42,8 +42,5 @@ function Get-StartEndDates {
         }
     }
 
-    $start = Get-Date -Year $Year -Month $startMonth -Day 1
-    $end = $start.AddMonths(3).AddDays(-1)
-
-    return @($start, $end)
+    return Get-Date -Year $Year -Month $startMonth -Day 1
 }
