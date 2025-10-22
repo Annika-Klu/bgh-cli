@@ -200,13 +200,14 @@ function Save-AppointmentsToExcel {
 
         $cellRange = $sheet.Range("A$($row):E$($row)")
 
+        $yellow = 65535
         if ($isSchoolHoliday) {
-            $cellRange.Interior.Color = 65535
+            $cellRange.Interior.Color = $yellow
             $msg = "$($isSchoolHoliday.name) ($($isSchoolHoliday.location))"
             $sheet.Cells.Item($row, 5).Value2 = $msg
         }
         if ($isPublicHoliday) {
-            $cellRange.Interior.Color = 255
+            $cellRange.Interior.Color = $yellow
             $msg = "$($isPublicHoliday.name) ($($isPublicHoliday.location))"
             $sheet.Cells.Item($row, 5).Value2 = $msg
         }
