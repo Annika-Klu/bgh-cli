@@ -7,10 +7,7 @@ function Assert-DeviceArg {
     if (-not $parsedCmd.Arguments -or (-not $parsedCmd.Arguments.ContainsKey("auf"))) {
         throw "Pflichtargument 'auf' (pc oder notebook) fehlt"
     }
-    $device = $parsedCmd.Arguments.auf
-    if ($device -notin $validDevices) {
-        throw "Ungültiges Argument für 'auf': $device"
-    }
+    $device = Test-UserInput -Name "auf" -Value $parsedCmd.Arguments.auf -ValidValues $validDevices
     return $device
 }
 
