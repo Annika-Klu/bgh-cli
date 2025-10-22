@@ -1,0 +1,52 @@
+name: Post Release Info to CLI Group
+
+on:
+  release:
+    types: [published, edited]
+  workflow_dispatch:
+
+env:
+  CT_LOGIN_TOKEN: ${{ secrets.CT_LOGIN_TOKEN }}
+  CT_API_URL: "https://${{ vars.CT_SUBDOMAIN }}.church.tools/api"
+  CT_GROUP_ID: ${{ secrets.CT_GROUP_ID }}
+
+jobs:
+  get-and-post-release-info:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install jq library
+        run: |
+          sudo apt-get update
+          sudo apt-get install jq -y
+      
+      - name: Get Release Information and Post to Group via API
+        run: |
+          echo "Will post"
+
+          RELEASE_TAG="${{ github.event.release.tag_name }}"
+          TITLE="Neue Version $RELEASE_TAG"
+          echo "Title: $TITLE"
+
+          RELEASE_BODY="${{ github.event.release.body }}"
+          BODY_HTML_LINE_BREAKS=$(echo "$RELEASE_BODY" | sed 's/\r\n/<br>/g' | sed 's/\n/<br>/g')
+          echo "Content: $BODY_HTML_LINE_BREAKS"
+
+          JSON_BODY=$(jq -n \
+            --arg groupId "${{ secrets.CT_GROUP_ID }}" \
+            --arg title "$TITLE" \
+            --arg content "$BODY_HTML_LINE_BREAKS" \
+            '{
+              groupId: $groupId,
+              title: $title,
+              content: $content,
+              visibility: "group_intern"
+            }')
+
+          curl -X POST "$CT_API_URL/posts" \
+          -H "Authorization: Login $CT_LOGIN_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d "$JSON_BODY"
