@@ -1,9 +1,7 @@
 try {
     Out-Message "ACHTUNG: Dies kann nicht rückgängig gemacht werden. Um das CLI danach wieder zu nutzen, musst du es erneut installieren." -Type "warning"
-    do {
-        $confirmUninstall = Read-Host "Deinstallieren? (j, sonst beenden mit Enter)"
-    } while ($confirmUninstall -ne "j" -and $confirmUninstall -ne "")
-    if ($confirmUninstall -eq "") {
+    $uninstall = Get-YesOrNo "Deinstallieren?"
+    if (-not $uninstall) {
         Out-Message "Deinstallation abgebrochen."
         return
     }
