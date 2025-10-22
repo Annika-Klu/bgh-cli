@@ -87,30 +87,6 @@ function Edit-AppointmentsFile {
     } while (-not $isValid)
 }
 
-function Set-QuarterAndYear {
-    $quarter = $parsedCmd.Arguments.quartal
-    $year = $parsedCmd.Arguments.jahr
-    $today = Get-Date
-
-    if ($year) { 
-        $year = Test-UserInput "Jahr" -Value $year -Type "int"
-    } else { $year = $today.Year }
-
-    if ($quarter) { 
-        $quarter = Test-UserInput "Quartal" -Value $quarter -Type "int" -ValidValues @(1, 2, 3, 4)
-    } else {
-        $currentQuarter = [math]::Ceiling($today.Month / 3)
-        $quarter = $currentQuarter + 1
-
-        if ($quarter -gt 4) {
-            $quarter = 1
-            $year += 1
-        }
-    }
-    
-    return @($quarter, $year)
-}
-
 $daysMap = @{
     "Mo" = [DayOfWeek]::Monday
     "Di" = [DayOfWeek]::Tuesday
@@ -203,6 +179,9 @@ try {
     }
     
     $quarter, $year = Set-QuarterAndYear
+
+    $saveFileBaseName = "Q$($quarter)_$($year)"
+    Out-Message "Erstelle Plan für $saveFileBaseName..."
     $startDate = Get-QuarterStartDate -Quarter $quarter -Year $year
     
     $appointments = Get-AppointmentDates -FilePath $filePath -StartDate $startDate

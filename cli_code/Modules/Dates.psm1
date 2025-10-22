@@ -1,24 +1,32 @@
+function Set-QuarterAndYear {
+    $quarter = $parsedCmd.Arguments.quartal
+    $year = $parsedCmd.Arguments.jahr
+    $today = Get-Date
+
+    if ($year) { 
+        $year = Test-UserInput "Jahr" -Value $year -Type "int"
+    } else { $year = $today.Year }
+
+    if ($quarter) { 
+        $quarter = Test-UserInput "Quartal" -Value $quarter -Type "int" -ValidValues @(1, 2, 3, 4)
+    } else {
+        $currentQuarter = [math]::Ceiling($today.Month / 3)
+        $quarter = $currentQuarter + 1
+
+        if ($quarter -gt 4) {
+            $quarter = 1
+            $year += 1
+        }
+    }
+    
+    return @($quarter, $year)
+}
+
 function Get-QuarterStartDate {
     param(
         [Int]$Quarter,
         [Int]$Year
     )
-
-    $heute = Get-Date
-    $definitionMode = "angegebenes"
-    if (-not $Year) { $Year = $heute.Year }
-    if (-not $Quarter) {
-        $definitionMode = "kommendes" 
-        $currentQuarter = [math]::Ceiling($heute.Month / 3)
-        $Quarter = $currentQuarter + 1
-
-        if ($Quarter -gt 4) {
-            $Quarter = 1
-            $Year += 1
-        }
-    }
-
-    Out-Message "Erstelle Plan für $definitionMode Q$Quarter-$Year..."
 
     switch ($Quarter) {
         1 {
