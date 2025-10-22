@@ -236,12 +236,10 @@ $baseName = "quartalstermine"
 
 try {
     $configFilePath = Join-Path $OUT_DIR "$baseName.json"
-    $editedDueToSyntaxErr = Assert-AppointmentsFile -FilePath $configFilePath
+    Assert-AppointmentsFile -FilePath $configFilePath
 
-    if (-not $editedDueToSyntaxErr) {
-        $editFile = Get-YesOrNo "Möchtest du die Termin-Konfigurationsdatei bearbeiten?"
-        if ($editFile) { Edit-AppointmentsFile -FilePath $configFilePath }
-    }
+    $editFile = Get-YesOrNo "Möchtest du die Termin-Konfigurationsdatei bearbeiten?"
+    if ($editFile) { Edit-AppointmentsFile -FilePath $configFilePath }
     
     $quarter, $year = Set-QuarterAndYear
 
