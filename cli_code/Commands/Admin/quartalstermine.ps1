@@ -157,9 +157,9 @@ function Get-AppointmentDates {
                 $allAppointments += [PSCustomObject]@{
                     Name     = $name
                     DatumObjekt = $datetime
-                    Datum    = $datetime.ToString("dd.MM.yyyy")
+                    Datum    = $datetime.ToString("dd.MM.")
                     Uhrzeit  = $datetime.ToString("HH:mm")
-                    Wochentag = $datetime.ToString("ddd", [System.Globalization.CultureInfo]::GetCultureInfo("de-DE")) #$datetime.DayOfWeek
+                    Wochentag = $datetime.ToString("ddd", [System.Globalization.CultureInfo]::GetCultureInfo("de-DE"))
                 }
             }
         }
@@ -167,25 +167,102 @@ function Get-AppointmentDates {
     return $allAppointments
 }
 
+function Save-AppointmentsToExcel {
+    param(
+        [Array]$Appointments,
+        [String]$SaveFileName
+    )
+    
+    $excel = New-Object -ComObject Excel.Application
+    $excel.Visible = $false
+    $workbook = $excel.Workbooks.Add()
+    $sheet = $workbook.Worksheets.Item(1)
+
+    $headers = @("Name", "Datum", "Uhrzeit", "Wochentag", "Anmerkung")
+    for ($i = 0; $i -lt $headers.Count; $i++) {
+        $sheet.Cells.Item(1, $i + 1).Value2 = $headers[$i]
+        $sheet.Cells.Item(1, $i + 1).Font.Bold = $true
+    }
+
+    $federalStates = @("HH", "SH")
+    $holidays = [Holidays]::new($federalStates)
+
+    $row = 2
+    foreach ($appointment in ($Appointments | Sort-Object DatumObjekt)) {
+        $sheet.Cells.Item($row, 1).Value2 = $appointment.Name
+        $sheet.Cells.Item($row, 2).Value2 = $appointment.Datum
+        $sheet.Cells.Item($row, 3).Value2 = $appointment.Uhrzeit
+        $sheet.Cells.Item($row, 4).Value2 = $appointment.Wochentag
+
+        $appointmentDate = $appointment.DatumObjekt.Date
+        $isPublicHoliday = $holidays.IsPublicHoliday($appointmentDate)
+        $isSchoolHoliday = $holidays.IsSchoolHoliday($appointmentDate)
+
+        $cellRange = $sheet.Range("A$($row):E$($row)")
+
+        if ($isSchoolHoliday) {
+            $cellRange.Interior.Color = 65535
+            $msg = "$($isSchoolHoliday.name) ($($isSchoolHoliday.location))"
+            $sheet.Cells.Item($row, 5).Value2 = $msg
+        }
+        if ($isPublicHoliday) {
+            $cellRange.Interior.Color = 255
+            $msg = "$($isPublicHoliday.name) ($($isPublicHoliday.location))"
+            $sheet.Cells.Item($row, 5).Value2 = $msg
+        }
+
+        $row++
+    }
+
+    $sheet.Columns.AutoFit()
+
+    $finalFilePath = Join-Path $OUT_DIR $SaveFileName
+    $workbook.SaveAs($finalFilePath) | Out-Null
+    $workbook.Saved = $true
+    $workbook.Close($false) | Out-Null
+    
+    $excel.Quit() | Out-Null
+
+    [System.Runtime.Interopservices.Marshal]::ReleaseComObject($sheet) | Out-Null
+    [System.Runtime.Interopservices.Marshal]::ReleaseComObject($workbook) | Out-Null
+    [System.Runtime.Interopservices.Marshal]::ReleaseComObject($excel) | Out-Null
+    [GC]::Collect() | Out-Null
+    [GC]::WaitForPendingFinalizers() | Out-Null
+
+    return [System.IO.Path]::GetFullPath($finalFilePath)
+}
+
 $baseName = "quartalstermine"
 
 try {
-    $filePath = Join-Path $OUT_DIR "$baseName.json"
-    $editedDueToSyntaxErr = Assert-AppointmentsFile -FilePath $filePath
+    $configFilePath = Join-Path $OUT_DIR "$baseName.json"
+    $editedDueToSyntaxErr = Assert-AppointmentsFile -FilePath $configFilePath
 
     if (-not $editedDueToSyntaxErr) {
         $editFile = Get-YesOrNo "Möchtest du die Termin-Konfigurationsdatei bearbeiten?"
-        if ($editFile) { Edit-AppointmentsFile -FilePath $filePath }
+        if ($editFile) { Edit-AppointmentsFile -FilePath $configFilePath }
     }
     
     $quarter, $year = Set-QuarterAndYear
 
-    $saveFileBaseName = "Q$($quarter)_$($year)"
-    Out-Message "Erstelle Plan für $saveFileBaseName..."
+    $saveFileName = "Q$($quarter)_$($year).xlsx"
+    Out-Message "Erstelle $saveFileName..."
     $startDate = Get-QuarterStartDate -Quarter $quarter -Year $year
     
-    $appointments = Get-AppointmentDates -FilePath $filePath -StartDate $startDate
-    $appointments | Sort-Object DatumObjekt | Select-Object Name, Datum, Uhrzeit, Wochentag  | Format-Table -AutoSize
+    $appointments = Get-AppointmentDates -FilePath $configFilePath -StartDate $startDate
+
+    Out-Line
+    Out-Message "Generierte Termine:"
+    $appointments | Sort-Object DatumObjekt | Select-Object Name, Datum, Uhrzeit, Wochentag | Format-Table -AutoSize
+
+    $returnValues = Save-AppointmentsToExcel -Appointments $appointments -SaveFileName $saveFileName
+    $excelFilePath = $returnValues | Where-Object { Test-Path $_ }
+    Out-Message "$saveFileName erfolgreich erstellt."
+    
+    $openFile = Get-YesOrNo "Datei jetzt öffnen?"
+    if ($openFile) {
+        Start-Process -FilePath $excelFilePath
+    }
 } catch {
     Out-Message $_.Exception.Message -Type "error"
     Write-ErrorMessage -Log $log -ErrMsg $_.Exception.Message
