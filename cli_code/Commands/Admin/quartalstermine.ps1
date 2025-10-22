@@ -167,49 +167,56 @@ function Get-AppointmentDates {
     return $allAppointments
 }
 
-function Save-AppointmentsToExcel {
+function Save-DataToExcel {
     param(
+        [Array]$Birthdays,
         [Array]$Appointments,
         [String]$SaveFileName
     )
     
     $excel, $workbook = Initialize-ExcelObjects
-    $sheet = $workbook.Worksheets.Item(1)
-    $sheet.Name = "Termine"
+    $birthdaysSheet = $workbook.Worksheets.Item(1)
+    $birthdaysSheet.Name = "Geburtstage"
+
+    $birthdayHeaders = @("Name", "Tag")
+    Add-ExcelTableData -Sheet $birthdaysSheet -Headers $birthdayHeaders -Data $Birthdays
+
+    $appointmentsSheet = $workbook.Worksheets.Add()
+    $appointmentsSheet.Name = "Termine"
 
     $federalStates = @("HH", "SH")
     $holidays = [Holidays]::new($federalStates)
 
-    $excelHeaders = @("Name", "Datum", "Uhrzeit", "Wochentag", "Anmerkung")
-    $excelData = $Appointments | Sort-Object DatumObjekt
+    $appointmentsHeaders = @("Name", "Datum", "Uhrzeit", "Wochentag", "Anmerkung")
+    $appointmentsData = $Appointments | Sort-Object DatumObjekt
     
-    Add-ExcelTableData -Sheet $sheet -Headers $excelHeaders -Data $excelData
+    Add-ExcelTableData -Sheet $appointmentsSheet -Headers $appointmentsHeaders -Data $appointmentsData
     
     $row = 2
-    foreach ($appointment in $excelData) {
+    foreach ($appointment in $appointmentsData) {
         $appointmentDate = $appointment.DatumObjekt.Date
         $isPublicHoliday = $holidays.IsPublicHoliday($appointmentDate)
         $isSchoolHoliday = $holidays.IsSchoolHoliday($appointmentDate)
 
-        $cellRange = $sheet.Range("A$($row):E$($row)")
+        $cellRange = $appointmentsSheet.Range("A$($row):E$($row)")
 
         $yellow = 65535
         if ($isSchoolHoliday -or $isPublicHoliday)  {
             $cellRange.Interior.Color = $yellow
             $holiday = if ($isPublicHoliday) { $isPublicHoliday } else { $isSchoolHoliday }
             $msg = "$($holiday.name) ($($holiday.location))"
-            $sheet.Cells.Item($row, 5).Value2 = $msg
+            $appointmentsSheet.Cells.Item($row, 5).Value2 = $msg
         }
         $row++
     }
 
-    $sheet.Columns.AutoFit()
+    $appointmentsSheet.Columns.AutoFit()
 
     $finalFilePath = Join-Path $OUT_DIR $SaveFileName
     $workbook.SaveAs($finalFilePath) | Out-Null
     $workbook.Saved = $true
     
-    Unregister-Excel -Excel $excel -Workbook $workbook -Sheet $sheet
+    Unregister-Excel -Excel $excel -Workbook $workbook -Sheet $appointmentsSheet
 
     return [System.IO.Path]::GetFullPath($finalFilePath)
 }
@@ -227,15 +234,17 @@ try {
 
     $saveFileName = "Q$($quarter)_$($year).xlsx"
     Out-Message "Erstelle $saveFileName..."
-    $startDate = Get-QuarterStartDate -Quarter $quarter -Year $year
+    $startDate, $endDate = Get-QuarterDates -Quarter $quarter -Year $year
+
+    $birthdays = Get-Birthdays -From $startDate -To $endDate
+    Out-Message "$($birthdays.Count) Geburtstage gefunden."
+    Out-Line
     
     $appointments = Get-AppointmentDates -FilePath $configFilePath -StartDate $startDate
-
-    Out-Line
     Out-Message "Generierte Termine:"
     $appointments | Sort-Object DatumObjekt | Select-Object Name, Datum, Uhrzeit, Wochentag | Format-Table -AutoSize
 
-    $returnValues = Save-AppointmentsToExcel -Appointments $appointments -SaveFileName $saveFileName
+    $returnValues = Save-DataToExcel -Birthdays $birthdays -Appointments $appointments -SaveFileName $saveFileName
     $excelFilePath = $returnValues | Where-Object { Test-Path $_ }
     Out-Message "$saveFileName erfolgreich erstellt."
     
