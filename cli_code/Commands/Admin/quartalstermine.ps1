@@ -173,27 +173,20 @@ function Save-AppointmentsToExcel {
         [String]$SaveFileName
     )
     
-    $excel = New-Object -ComObject Excel.Application
-    $excel.Visible = $false
-    $workbook = $excel.Workbooks.Add()
+    $excel, $workbook = Initialize-ExcelObjects
     $sheet = $workbook.Worksheets.Item(1)
-
-    $headers = @("Name", "Datum", "Uhrzeit", "Wochentag", "Anmerkung")
-    for ($i = 0; $i -lt $headers.Count; $i++) {
-        $sheet.Cells.Item(1, $i + 1).Value2 = $headers[$i]
-        $sheet.Cells.Item(1, $i + 1).Font.Bold = $true
-    }
+    $sheet.Name = "Termine"
 
     $federalStates = @("HH", "SH")
     $holidays = [Holidays]::new($federalStates)
 
+    $excelHeaders = @("Name", "Datum", "Uhrzeit", "Wochentag", "Anmerkung")
+    $excelData = $Appointments | Sort-Object DatumObjekt
+    
+    Add-ExcelTableData -Sheet $sheet -Headers $excelHeaders -Data $excelData
+    
     $row = 2
-    foreach ($appointment in ($Appointments | Sort-Object DatumObjekt)) {
-        $sheet.Cells.Item($row, 1).Value2 = $appointment.Name
-        $sheet.Cells.Item($row, 2).Value2 = $appointment.Datum
-        $sheet.Cells.Item($row, 3).Value2 = $appointment.Uhrzeit
-        $sheet.Cells.Item($row, 4).Value2 = $appointment.Wochentag
-
+    foreach ($appointment in $excelData) {
         $appointmentDate = $appointment.DatumObjekt.Date
         $isPublicHoliday = $holidays.IsPublicHoliday($appointmentDate)
         $isSchoolHoliday = $holidays.IsSchoolHoliday($appointmentDate)
@@ -215,15 +208,8 @@ function Save-AppointmentsToExcel {
     $finalFilePath = Join-Path $OUT_DIR $SaveFileName
     $workbook.SaveAs($finalFilePath) | Out-Null
     $workbook.Saved = $true
-    $workbook.Close($false) | Out-Null
     
-    $excel.Quit() | Out-Null
-
-    [System.Runtime.Interopservices.Marshal]::ReleaseComObject($sheet) | Out-Null
-    [System.Runtime.Interopservices.Marshal]::ReleaseComObject($workbook) | Out-Null
-    [System.Runtime.Interopservices.Marshal]::ReleaseComObject($excel) | Out-Null
-    [GC]::Collect() | Out-Null
-    [GC]::WaitForPendingFinalizers() | Out-Null
+    Unregister-Excel -Excel $excel -Workbook $workbook -Sheet $sheet
 
     return [System.IO.Path]::GetFullPath($finalFilePath)
 }
