@@ -1,0 +1,13 @@
+[
+  {
+    "name": "Termin jeden 1. und 4. Mittwoch im Monat um 10.00 Uhr",
+    "wochentag": "Mi",
+    "uhrzeit": "10.00",
+    "monatswoche": [1, 4]
+  },
+  {
+    "name": "Termin jeden Samstag im Monat um 15.00 Uhr",
+    "wochentag": "Sa",
+    "uhrzeit": "15.00"
+  }
+]
