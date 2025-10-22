@@ -10,16 +10,59 @@ function Assert-AppointmentsFile {
     Copy-Item -Path $templatePath -Destination $FilePath
 }
 
+function Test-AppointmentsValid {
+    param(
+        [String]$FilePath
+    )
+    
+    $contentValid = $true
+    $appointments = Get-JsonContent -JsonPath $FilePath
+
+    $mutuallyExclusiveProperties = @("tagmonat", "wochentag")
+    foreach ($appointment in $appointments) {
+
+        $matches = 0                
+        foreach ($property in $mutuallyExclusiveProperties) {    
+            if ($appointment.PSObject.Properties.Name -contains $property) { 
+                $matches += 1
+            }
+        }
+        $propertiesValid = ($matches -eq 1)
+
+        if (-not $propertiesValid) { 
+            $contentValid = $false
+            $validProperties = $mutuallyExclusiveProperties -join ", "
+            Out-Message "Eintrag '$($appointment.name)' muss genau eine der folgenden Eigenschaften haben: $($validProperties)" -Type "error"
+        }
+
+        $tagmonatPattern = "^(?<_day>\d{2})\.(?<_month>\d{2})\.$"
+        if ($appointment.PSObject.Properties.Name -contains "tagmonat") {
+            if ($appointment.tagmonat -notmatch $tagmonatPattern) {
+                $contentValid = $false
+                Out-Message "Eintrag '$($appointment.name)' hat falschen Wert für 'tagmonat'. Format: 'dd.MM.'" -Type "error"
+            } else {
+                $day = [int]$matches["_day"]
+                if ($day -lt 1 -or $day -gt 31) {
+                    $contentValid = $false
+                    Out-Message "Eintrag '$($appointment.name)' hat falschen Tageswert für 'tagmonat'. Erlaubt: 1-31" -Type "error"
+                }
+
+                $month = [int]$matches['_month']
+                if ($month -lt 1 -or $month -gt 12) {
+                    $contentValid = $false
+                    Out-Message "Eintrag '$($appointment.name)' hat falschen Monatswert für 'tagmonat'. Erlaubt: 1-12" -Type "error"
+                }
+            }
+        }
+    }
+    return $contentValid
+}
+
 function Edit-AppointmentsFile {
     param(
         [String]$FilePath
     )
 
-    # $editor = "notepad.exe"
-    # $proc = Start-Process -FilePath $editor -ArgumentList $FilePath -PassThru
-
-    # Out-Message "Bitte schließe die Datei '$baseName.json', wenn du mit der Bearbeitung fertig bist."
-    # $proc.WaitForExit()
     do {
         $editor = "notepad.exe"
         $baseName = [System.IO.Path]::GetFileNameWithoutExtension($FilePath)
@@ -29,28 +72,13 @@ function Edit-AppointmentsFile {
         Out-Message "Speichere und schließe '$baseName.json', wenn du mit der Bearbeitung fertig bist."
         $proc.WaitForExit()
 
-        $isValid = Test-JsonContent -JsonPath $FilePath
+        $syntaxValid = Test-JsonContent -JsonPath $FilePath
         
-        if ($isValid) {
-           $appointments = Get-JsonContent -JsonPath $FilePath
-
-            $mutuallyExclusiveProperties = @("tagmonat", "wochentag")
-            foreach ($appointment in $appointments) {
-
-                $matches = 0                
-                foreach ($property in $mutuallyExclusiveProperties) {    
-                    if ($appointment.PSObject.Properties.Name -contains $property) { 
-                        $matches += 1
-                    }
-                }
-                $propertiesValid = ($matches -eq 1)
-                if (-not $propertiesValid) { 
-                    $isValid = $false
-                    $validProperties = $mutuallyExclusiveProperties -join ", "
-                    Out-Message "Eintrag '$($appointment.name)' muss genau eine der folgenden Eigenschaften haben: $($validProperties)" -Type "error"
-                }
-            }
+        $contentValid = $true
+        if ($syntaxValid) {
+           $contentValid = Test-AppointmentsValid -FilePath $FilePath
         }
+        $isValid = ($syntaxValid -and $contentValid)
     } while (-not $isValid)
 }
 
@@ -75,8 +103,10 @@ function Get-AppointmentDates {
 
     foreach ($appointment in $appointmentSchedule) {
         $name = $appointment.name
-        $weeksOfMonth = if ($appointment.PSObject.Properties.Match("monatswoche")) { $appointment.monatswoche } else { $null }
-        $weekday = $daysMap[$appointment.wochentag]
+        
+        $weeksOfMonth = if ($appointment.PSObject.Properties.Name -contains "monatswoche") { $appointment.monatswoche } else { $null }
+        $dayMonth = if ($appointment.PSObject.Properties.Name -contains "tagmonat") { $appointment.tagmonat } else { $null }
+        $weekday = if ($appointment.PSObject.Properties.Name -contains "wochentag") { $daysMap[$appointment.wochentag] } else { $null }
 
         $time = $appointment.uhrzeit
         $parts = $time -split "\."
@@ -89,19 +119,26 @@ function Get-AppointmentDates {
 
             $daysOfMonth = @()
             for ($d = $monthStart; $d -le $monthEnd; $d = $d.AddDays(1)) {
-                if ($d.DayOfWeek -eq $weekday) {
+                if ($weekday -and $d.DayOfWeek -eq $weekday) {
                     $daysOfMonth += $d
                 }
             }
 
+            $selectedDays = @()
             if ($weeksOfMonth) {
-                $selectedDays = @()
                 foreach ($week in $weeksOfMonth) {
                     $index = [int]$week - 1
                     if ($index -lt $daysOfMonth.Count) {
                         $selectedDays += $daysOfMonth[$index]
                     }
                 }
+            } elseif ($dayMonth) {
+                $parts = $dayMonth -split "\."
+                $dayMonthDate = Get-Date -Day $parts[0] -Month $parts[1] -Year $StartDate.year
+                if ($dayMonthDate -ge $monthStart -and $dayMonthDate -le $monthEnd) {
+                    $selectedDays += $dayMonthDate
+                }
+
             } else {
                 $selectedDays = $daysOfMonth
             }

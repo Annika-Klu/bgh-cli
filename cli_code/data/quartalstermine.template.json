@@ -9,5 +9,10 @@
     "name": "Termin jeden Samstag im Monat um 15.00 Uhr",
     "wochentag": "Sa",
     "uhrzeit": "15.00"
+  },
+  {
+    "name": "Termin immer am 24.12. (sofern in generiertem Quartal enthalten) um 15.00 Uhr",
+    "tagmonat": "24.12.",
+    "uhrzeit": "15.00"
   }
 ]
