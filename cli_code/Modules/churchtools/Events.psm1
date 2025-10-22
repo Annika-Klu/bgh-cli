@@ -1,10 +1,3 @@
-function Get-ApiDate {
-    param(
-        [datetime]$Date
-    )
-    return $Date.ToString("yyyy-MM-dd")
-}
-
 function Save-EventFiles {
     param(
         [datetime]$ForDate = $(Get-Date),

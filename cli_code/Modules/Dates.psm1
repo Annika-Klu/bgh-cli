@@ -1,3 +1,10 @@
+function Get-ApiDate {
+    param(
+        [datetime]$Date
+    )
+    return $Date.ToString("yyyy-MM-dd")
+}
+
 function Set-QuarterAndYear {
     $quarter = $parsedCmd.Arguments.quartal
     $year = $parsedCmd.Arguments.jahr
@@ -22,7 +29,7 @@ function Set-QuarterAndYear {
     return @($quarter, $year)
 }
 
-function Get-QuarterStartDate {
+function Get-QuarterDates {
     param(
         [Int]$Quarter,
         [Int]$Year
@@ -50,5 +57,7 @@ function Get-QuarterStartDate {
         }
     }
 
-    return Get-Date -Year $Year -Month $startMonth -Day 1
+    $start = Get-Date -Year $Year -Month $startMonth -Day 1
+    $end = $start.AddMonths(3).AddDays(-1)
+    return @($start, $end)
 }
