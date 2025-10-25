@@ -111,7 +111,11 @@ function Get-AppointmentDates {
         
         $weeksOfMonth = if ($appointment.PSObject.Properties.Name -contains "monatswoche") { $appointment.monatswoche } else { $null }
         $dayMonth = if ($appointment.PSObject.Properties.Name -contains "tagmonat") { $appointment.tagmonat } else { $null }
-        $weekday = if ($appointment.PSObject.Properties.Name -contains "wochentag") { $daysMap[$appointment.wochentag] } else { $null }
+        if ($appointment.wochentag -and $daysMap.ContainsKey($appointment.wochentag)) {
+            $weekday = [DayOfWeek]$daysMap[$appointment.wochentag]
+        } else {
+            $weekday = $null
+        }
 
         $time = $appointment.uhrzeit
         $parts = $time -split "\."
@@ -124,7 +128,7 @@ function Get-AppointmentDates {
 
             $daysOfMonth = @()
             for ($d = $monthStart; $d -le $monthEnd; $d = $d.AddDays(1)) {
-                if ($weekday -and $d.DayOfWeek -eq $weekday) {
+                if ($null -ne $weekday -and $d.DayOfWeek -eq $weekday) {
                     $daysOfMonth += $d
                 }
             }
