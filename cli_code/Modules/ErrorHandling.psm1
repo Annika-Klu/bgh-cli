@@ -6,11 +6,9 @@ function Send-ErrorReport {
     $groupName = "CLI"
 
     Out-Message "Falls der Fehler häufiger auftritt und du nicht weiterkommst, kannst du ihn in der Gruppe '$groupName' melden." -Type "debug"
-    do {
-        $choice = Read-Host "Fehler melden? (j, sonst beenden mit Enter)"
-    } while ($choice -ne "j" -and $choice -ne "")
     
-    if (-not $choice) { return }
+    $reportError = Get-YesOrNo "Fehler melden?"
+    if (-not $reportError) { return }
 
     $ct = [ChurchTools]::new($CT_API_URL)
     if (-not $ct) {
@@ -19,7 +17,7 @@ function Send-ErrorReport {
     }
     
     $content = "Fehlermeldung: '$ErrMsg'"
-    $additionalInfo = Read-Host "Beschreibung zusätzlich zur Fehlermeldung (optional, sonst weiter mit Enter):"
+    $additionalInfo = Read-Host "Beschreibung zusätzlich zur Fehlermeldung (optional, sonst weiter mit Enter)"
     if ($additionalInfo) { $content += " | Ergänzende Beschreibung: $additionalInfo" }
     
     $cliGroup = $ct.FindGroup($groupName)
