@@ -61,3 +61,7 @@ function Get-QuarterDates {
     $end = $start.AddMonths(3).AddDays(-1)
     return @($start, $end)
 }
+
+function Get-FileTimestamp {
+    return Get-Date -Format "yyyyMMdd_HHmm"
+}
