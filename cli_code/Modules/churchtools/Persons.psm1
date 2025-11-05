@@ -56,12 +56,12 @@ function Get-PersonsBackupData {
         $allPersonsData += [PSCustomObject]@{
             Vorname = $person.firstName
             Nachame   = $person.lastName
-            Status = $statusMap[$person.statusId]
-            Email = $person.email
             Spitzname = $person.nickname
+            Status = $statusMap[$person.statusId]
             Geburtstag  = $birthday
             Tel = $person.phonePrivate
             Mobil = $person.mobile
+            Email = $person.email
             Strasse = $person.street
             PLZ = $person.zip
             Ort = $person.city
