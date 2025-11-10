@@ -4,18 +4,25 @@ function Get-Songs {
     $CtSongs = @()
     
     foreach ($song in $songs) {
-        $songData = @{
-            "name" = $song.name
-            "author" = $song.author
-            "files" = @()
+        $songData = [PSCustomObject]@{
+            Name = $song.name
+            Autor = $song.author
+            Liederbuecher = @()
+            files = @()
         }
 
-        foreach ($arragement in $song.arrangements) {
-            $pptFiles = $arragement.files | Where-Object { $_.name.Contains(".pptx") }
+        foreach ($arrangement in $song.arrangements) {
+            if ($arrangement.source) {
+                $sourceName = $arrangement.source.name
+                $songData.Liederbuecher += "$sourceName Nr. $($arrangement.sourceReference)"
+            }
+
+            $pptFiles = $arrangement.files | Where-Object { $_.name.Contains(".pptx") }
             if ($pptFiles) {
                 $songData.files += $pptFiles
             }
         }
+
         $CtSongs += $songData
     }
     return $CtSongs
