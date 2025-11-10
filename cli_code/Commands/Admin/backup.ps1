@@ -16,8 +16,16 @@ try {
     New-Item -ItemType Directory -Path $tempSongsBackupDir | Out-Null
     $songsBackupFile = Join-Path $tempSongsBackupDir "Lieder.csv"
     $songs = Get-Songs
-    $songs | Select-Object Name, Autor, @{Name="Liederbuecher"; Expression={ ($_.Liederbuecher -join ', ') }} | Export-Csv -Path $songsBackupFile -NoTypeInformation -Encoding UTF8
+    
  
+    $songFiles = @()
+    foreach ($song in $songs) {
+        if ($song.files.Count -gt 0) {
+            $songFiles += $song.files
+        }
+    }
+    Sync-FromChurchtoolsToLocal -CtSongFiles $songFiles -SongsDir $tempSongsBackupDir
+    $songs | Select-Object Name, Autor, @{Name="Liederbuecher"; Expression={ ($_.Liederbuecher -join ', ') }} | Export-Csv -Path $songsBackupFile -NoTypeInformation -Encoding UTF8
 
     $zipFileName = "$backupName.zip"
     $zipFilePath = Join-Path $OUT_DIR $zipFileName
