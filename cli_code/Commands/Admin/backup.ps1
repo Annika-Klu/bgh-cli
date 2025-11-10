@@ -16,7 +16,6 @@ try {
     New-Item -ItemType Directory -Path $tempSongsBackupDir | Out-Null
     $songsBackupFile = Join-Path $tempSongsBackupDir "Lieder.csv"
     $songs = Get-Songs
-    
  
     $songFiles = @()
     foreach ($song in $songs) {
@@ -26,6 +25,23 @@ try {
     }
     Sync-FromChurchtoolsToLocal -CtSongFiles $songFiles -SongsDir $tempSongsBackupDir
     $songs | Select-Object Name, Autor, @{Name="Liederbuecher"; Expression={ ($_.Liederbuecher -join ', ') }} | Export-Csv -Path $songsBackupFile -NoTypeInformation -Encoding UTF8
+
+    $tempWikisBackupDir = Join-Path $tempBackupDir "Wikis"
+    New-Item -ItemType Directory -Path $tempWikisBackupDir | Out-Null
+    $wikis = Get-Wikis
+    foreach ($wiki in $wikis) {
+        $wikiSubDir = Join-Path $tempWikisBackupDir $wiki.name
+        New-Item -ItemType Directory -Path $wikiSubDir | Out-Null
+        $wikiPages = Get-WikiPages -WikiCategoryId $wiki.id 
+        foreach ($page in $wikiPages) {
+            $pageDir = Join-Path $wikiSubDir $page.title
+            New-Item -ItemType Directory -Path $pageDir | Out-Null
+            $pageContentFile = Join-Path $pageDir "$($page.title).txt"
+            Save-WikiPage -WikiCategoryId $wiki.id -WikiPageId $page.identifier -SavePath $pageContentFile
+            Save-WikiPageFiles -WikiCategoryId $wiki.id -WikiPageId $page.identifier -SaveDir $pageDir
+        }
+    }
+    $wikis | Format-Table -Autosize
 
     $zipFileName = "$backupName.zip"
     $zipFilePath = Join-Path $OUT_DIR $zipFileName
