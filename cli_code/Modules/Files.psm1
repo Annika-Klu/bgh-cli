@@ -86,14 +86,11 @@ function Compress-FilesToZip {
         [string]$ZipFilePath 
     )
 
-   
     if (Test-Path -Path $ZipFilePath) {
         Out-Message "Die ZIP-Datei '$ZipFilePath' existiert bereits. Sie wird überschrieben." -Type "warning"
         Remove-Item -Path $ZipFilePath
     }
 
-    Out-Message "Komprimiere Dateien aus '$SourceFolder' in '$ZipFilePath'..."
+    Out-Message "Komprimiere Dateien..."
     Compress-Archive -Path "$SourceFolder\*" -DestinationPath $ZipFilePath
-
-    Out-Message "Die Dateien wurden erfolgreich in '$ZipFilePath' gespeichert."
 }

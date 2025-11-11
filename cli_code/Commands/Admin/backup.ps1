@@ -21,6 +21,7 @@ try {
     New-Item -ItemType Directory -Path $tempBackupDir | Out-Null
     Out-Message $tempBackupDir
     Out-Message "Erstelle Backup..."
+    Out-Message "Dies kann einige Minuten dauern, bitte dieses Fenster nicht schließen!"
     
     $persons = Get-PersonsBackupData -StatusNames $relevantStatuses
     $personsBackupFile = Join-Path $tempBackupDir "Personen.csv"
@@ -57,8 +58,8 @@ try {
     }
     $wikis | Format-Table -Autosize
 
-    Out-Message "Backup erstellt: $zipFilePath"
     Compress-FilesToZip -SourceFolder $tempBackupDir -ZipFilePath $zipFilePath
+    Out-Message "Backup erstellt: $zipFilePath"
 
     Remove-Item -Recurse -Force -Path $tempBackupDir
 } catch {
