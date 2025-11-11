@@ -58,6 +58,7 @@ try {
 
     $wikis = Get-Wikis
     foreach ($wiki in $wikis) {
+        Out-Message "Sichere Inhalte von '$($wiki.name)'..."
         $wikiSubDir = Join-Path $tempWikisBackupDir $wiki.name
         New-Item -ItemType Directory -Path $wikiSubDir | Out-Null
         $wikiPages = Get-WikiPages -WikiCategoryId $wiki.id 
@@ -70,12 +71,16 @@ try {
         }
     }
 
+    $backupStats = Get-DirStats -DirPath $tempBackupDir
     Compress-FilesToZip -SourceFolder $tempBackupDir -ZipFilePath $zipFilePath
     Remove-Item -Recurse -Force -Path $tempBackupDir
 
     $timer.Stop()
+    Out-Line
     Out-Message "Backup erstellt: $zipFilePath"
     $timer.LogDuration("Gesamtdauer:")
+    Out-Message "Dateien: $($backupStats.FileCount)"
+    Out-Message "Größe: $($backupStats.TotalSizeMB)MB"
 } catch {
     Out-Message $_.Exception.Message -Type "error"
     Write-ErrorMessage -Log $log -ErrMsg $_.Exception.Message

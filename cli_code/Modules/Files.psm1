@@ -94,3 +94,24 @@ function Compress-FilesToZip {
     Out-Message "Komprimiere Dateien..."
     Compress-Archive -Path "$SourceFolder\*" -DestinationPath $ZipFilePath
 }
+
+function Get-DirStats {
+    param (
+        [string]$DirPath
+    )
+
+    if (Test-Path $DirPath) {
+        $files = Get-ChildItem -Path $DirPath -File -Recurse
+        $fileCount = $files.Count
+        $totalSize = ($files | Measure-Object -Property Length -Sum).Sum
+
+        $stats = [PSCustomObject]@{
+            FileCount = $fileCount
+            TotalSizeMB = [math]::Round($totalSize / 1MB, 2)
+        }
+
+        return $stats
+    } else {
+        Write-Error "Der angegebene Pfad ist ungültig oder kein Verzeichnis."
+    }
+}
