@@ -29,10 +29,14 @@ try {
     Out-Message "Erstelle Backup..."
     Out-Message "Dies kann einige Minuten dauern, bitte dieses Fenster nicht schließen!"
     
+    Out-Line
+    Out-Message "Teil 1 von 3 - Personen"
     $persons = Get-PersonsBackupData -StatusNames $relevantStatuses
     $personsBackupFile = Join-Path $tempBackupDir "Personen.csv"
     $persons | Select-Object * | Export-Csv -Path $personsBackupFile -NoTypeInformation -Encoding UTF8
 
+    Out-Line
+    Out-Message "Teil 2 von 3 - Lieder"
     $tempSongsBackupDir = Join-Path $tempBackupDir "Lieder"
     New-Item -ItemType Directory -Path $tempSongsBackupDir | Out-Null
     $songsBackupFile = Join-Path $tempSongsBackupDir "Lieder.csv"
@@ -44,11 +48,14 @@ try {
             $songFiles += $song.files
         }
     }
-    Sync-FromChurchtoolsToLocal -CtSongFiles $songFiles -SongsDir $tempSongsBackupDir
+    Sync-FromChurchtoolsToLocal -CtSongFiles $songFiles -SongsDir $tempSongsBackupDir | Out-Null
     $songs | Select-Object Name, Autor, @{Name="Liederbuecher"; Expression={ ($_.Liederbuecher -join ', ') }} | Export-Csv -Path $songsBackupFile -NoTypeInformation -Encoding UTF8
 
+    Out-Line
+    Out-Message "Teil 3 von 3 - Wikis"
     $tempWikisBackupDir = Join-Path $tempBackupDir "Wikis"
     New-Item -ItemType Directory -Path $tempWikisBackupDir | Out-Null
+
     $wikis = Get-Wikis
     foreach ($wiki in $wikis) {
         $wikiSubDir = Join-Path $tempWikisBackupDir $wiki.name
@@ -62,7 +69,6 @@ try {
             Save-WikiPageFiles -WikiCategoryId $wiki.id -WikiPageId $page.identifier -SaveDir $pageDir
         }
     }
-    $wikis | Format-Table -Autosize
 
     Compress-FilesToZip -SourceFolder $tempBackupDir -ZipFilePath $zipFilePath
     Remove-Item -Recurse -Force -Path $tempBackupDir
