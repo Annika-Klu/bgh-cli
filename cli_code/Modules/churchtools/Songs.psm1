@@ -1,17 +1,31 @@
-function Get-ChurchtoolsSongFiles {
+function Get-Songs {
     $ct = [ChurchTools]::new($CT_API_URL)
     $songs = $ct.PaginateRequest("songs", 100)
-    $CtSongFiles = @()
+    $CtSongs = @()
     
     foreach ($song in $songs) {
-        foreach ($arragement in $song.arrangements) {
-            $pptFiles = $arragement.files | Where-Object { $_.name.Contains(".pptx")}
+        $songData = [PSCustomObject]@{
+            Name = $song.name
+            Autor = $song.author
+            Liederbuecher = @()
+            files = @()
+        }
+
+        foreach ($arrangement in $song.arrangements) {
+            if ($arrangement.source) {
+                $sourceName = $arrangement.source.name
+                $songData.Liederbuecher += "$sourceName Nr. $($arrangement.sourceReference)"
+            }
+
+            $pptFiles = $arrangement.files | Where-Object { $_.name.Contains(".pptx") }
             if ($pptFiles) {
-                $CtSongFiles = $CtSongFiles + $pptFiles
+                $songData.files += $pptFiles
             }
         }
+
+        $CtSongs += $songData
     }
-    return $CtSongFiles
+    return $CtSongs
 }
 
 function Revoke-SongFilesNotInChurchtools {
@@ -57,13 +71,15 @@ function Sync-FromChurchtoolsToLocal {
             $apiFileLastModified = [DateTime]::ParseExact($lastModifiedDateStr, "yyyy-MM-ddTHH:mm:ssZ", $null)
             $savedFileLastModified = (Get-Item $savePath).LastWriteTime
             if ($apiFileLastModified -gt $savedFileLastModified) {
+                Out-Message "Aktualisiere '$($file.name)'"
                 $stats["updated"]++
-                $ct.CallApi("GET", $file.fileUrl, $null, $savePath)
+                $ct.CallApi("GET", $file.fileUrl, $null, $savePath) | Out-Null
             }
             continue
         }
+        Out-Message "Speichere (neu) '$($file.name)'"
         $stats["new"]++
-        $ct.CallApi("GET", $file.fileUrl, $null, $savePath)
+        $ct.CallApi("GET", $file.fileUrl, $null, $savePath) | Out-Null
     }
     return $stats
 }
