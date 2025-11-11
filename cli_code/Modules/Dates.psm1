@@ -63,5 +63,5 @@ function Get-QuarterDates {
 }
 
 function Get-FileTimestamp {
-    return Get-Date -Format "yyyyMMdd_HHmm"
+    return Get-Date -Format "yyyyMMdd"
 }
