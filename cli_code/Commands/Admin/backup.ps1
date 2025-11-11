@@ -21,8 +21,11 @@ try {
         }
     }
 
+    if (Test-Path $tempBackupDir) {
+        Remove-Item -Recurse -Force -Path  $tempBackupDir
+    }
     New-Item -ItemType Directory -Path $tempBackupDir | Out-Null
-    Out-Message $tempBackupDir
+    
     Out-Message "Erstelle Backup..."
     Out-Message "Dies kann einige Minuten dauern, bitte dieses Fenster nicht schließen!"
     
