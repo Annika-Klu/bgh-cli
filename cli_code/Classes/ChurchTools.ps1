@@ -35,7 +35,7 @@ class ChurchTools {
 
         if ($OutFile) {
             $params['OutFile'] = $OutFile
-            Invoke-WebRequest @params
+            Invoke-WebRequest @params | Out-Null
             return $OutFile
         } else {
             $response = Invoke-WebRequest @params
