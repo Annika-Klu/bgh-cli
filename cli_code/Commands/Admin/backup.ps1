@@ -4,6 +4,20 @@ $backupName = "churchtools_backup_$(Get-FileTimestamp)"
 $tempBackupDir = Join-Path $env:TEMP $backupName
 
 try {
+    $zipFileName = "$backupName.zip"
+    $zipFilePath = Join-Path $OUT_DIR $zipFileName
+
+    if (Test-Path $zipFilePath) {
+        $overwrite = Get-YesOrNo "$zipFileName existiert bereits. Möchtest du sie überschreiben?"
+        if ($overwrite) {
+            Remove-Item -Recurse -Force -Path $zipFilePath
+        }
+        else {
+            Out-Message "Backup abgebrochen."
+            exit 0
+        }
+    }
+
     New-Item -ItemType Directory -Path $tempBackupDir | Out-Null
     Out-Message $tempBackupDir
     Out-Message "Erstelle Backup..."
@@ -43,8 +57,6 @@ try {
     }
     $wikis | Format-Table -Autosize
 
-    $zipFileName = "$backupName.zip"
-    $zipFilePath = Join-Path $OUT_DIR $zipFileName
     Out-Message "Backup erstellt: $zipFilePath"
     Compress-FilesToZip -SourceFolder $tempBackupDir -ZipFilePath $zipFilePath
 
