@@ -4,6 +4,9 @@ $backupName = "churchtools_backup_$(Get-FileTimestamp)"
 $tempBackupDir = Join-Path $env:TEMP $backupName
 
 try {
+    $timer = [Timer]::new()
+    $timer.Start()
+
     $zipFileName = "$backupName.zip"
     $zipFilePath = Join-Path $OUT_DIR $zipFileName
 
@@ -59,9 +62,11 @@ try {
     $wikis | Format-Table -Autosize
 
     Compress-FilesToZip -SourceFolder $tempBackupDir -ZipFilePath $zipFilePath
-    Out-Message "Backup erstellt: $zipFilePath"
-
     Remove-Item -Recurse -Force -Path $tempBackupDir
+
+    $timer.Stop()
+    Out-Message "Backup erstellt: $zipFilePath"
+    $timer.LogDuration("Gesamtdauer:")
 } catch {
     Out-Message $_.Exception.Message -Type "error"
     Write-ErrorMessage -Log $log -ErrMsg $_.Exception.Message
