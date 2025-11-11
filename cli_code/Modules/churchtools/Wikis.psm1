@@ -36,6 +36,6 @@ function Save-WikiPageFiles {
     }
     foreach ($file in $files.data) {
         $savePath = Join-Path $SaveDir $file.name
-        $ct.CallApi("GET", $file.fileUrl, $null, $savePath)
+        $ct.CallApi("GET", $file.fileUrl, $null, $savePath) | Out-Null
     }
 }

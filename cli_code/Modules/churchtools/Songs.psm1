@@ -73,13 +73,13 @@ function Sync-FromChurchtoolsToLocal {
             if ($apiFileLastModified -gt $savedFileLastModified) {
                 Out-Message "Aktualisiere '$($file.name)'"
                 $stats["updated"]++
-                $ct.CallApi("GET", $file.fileUrl, $null, $savePath)
+                $ct.CallApi("GET", $file.fileUrl, $null, $savePath) | Out-Null
             }
             continue
         }
         Out-Message "Speichere (neu) '$($file.name)'"
         $stats["new"]++
-        $ct.CallApi("GET", $file.fileUrl, $null, $savePath)
+        $ct.CallApi("GET", $file.fileUrl, $null, $savePath) | Out-Null
     }
     return $stats
 }
