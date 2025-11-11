@@ -24,15 +24,19 @@ function Send-ErrorReport {
     if (-not $cliGroup) {
         throw "Gruppe '$groupName' konnte nicht gefunden werden oder Churchtools ist nicht erreichbar."
     }
+
+    $cmdInfo = if ($parsedCmd.Subcommands) { 
+        "$BASE_CMD $($parsedCmd.Subcommands)"
+    } else { $BASE_CMD }
+
     $comment = @{
         "groupId" = $cliGroup.id
-        "title" = "Fehler bei CLI-Befehl '$BASE_CMD'"
+        "title" = "Fehler bei CLI-Befehl '$cmdInfo'"
         "content" = $content
         "visibility" = "group_intern"
     }
-    $res = $ct.CallApi("POST", "posts", $comment, $null)
-    $errorReportResult = $res | ConvertTo-Json -Compress
-    $Log.Write("ERROR REPORT SENT. RESPONSE: $errorReportResult")
+    $ct.CallApi("POST", "posts", $comment, $null) | Out-Null
+    Out-Message "Fehlerbericht gesendet."
 }
 
 function Write-ErrorMessage {
