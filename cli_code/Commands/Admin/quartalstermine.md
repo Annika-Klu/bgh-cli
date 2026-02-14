@@ -1,4 +1,4 @@
-Erstellt eine Excelliste mit Geburtstagen und Monatsterminen* eines Quartals.
+﻿Erstellt eine Excelliste mit Geburtstagen und Monatsterminen* eines Quartals.
 Dies dient als Grundlage für den Quartalsplan; Monatstermine werden basierend
 auf einer Vorlage generiert, die zuvor bearbeitet werden kann.
 
