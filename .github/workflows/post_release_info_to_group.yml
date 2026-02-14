@@ -24,6 +24,7 @@ jobs:
           sudo apt-get install jq -y
       
       - name: Get Release Information and Post to Group via API
+        shell: bash
         run: |
           echo "Will post"
 
@@ -31,9 +32,9 @@ jobs:
           TITLE="Neue Version $RELEASE_TAG"
           echo "Title: $TITLE"
 
-          RELEASE_BODY="${{ github.event.release.body }}"
-          BODY_HTML_LINE_BREAKS=$(echo "$RELEASE_BODY" | sed 's/\r\n/<br>/g' | sed 's/\n/<br>/g')
-          echo "Content: $BODY_HTML_LINE_BREAKS"
+          RELEASE_BODY='${{ github.event.release.body }}'
+
+          BODY_HTML_LINE_BREAKS=$(echo "$RELEASE_BODY" | sed ':a;N;$!ba;s/\r\n/<br>/g;s/\n/<br>/g')
 
           JSON_BODY=$(jq -n \
             --arg groupId "${{ secrets.CT_GROUP_ID }}" \
@@ -47,6 +48,6 @@ jobs:
             }')
 
           curl -X POST "$CT_API_URL/posts" \
-          -H "Authorization: Login $CT_LOGIN_TOKEN" \
-          -H "Content-Type: application/json" \
-          -d "$JSON_BODY"
+            -H "Authorization: Login $CT_LOGIN_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$JSON_BODY"
