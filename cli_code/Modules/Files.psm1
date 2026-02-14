@@ -61,3 +61,54 @@ function Get-DirStats {
         Write-Error "Der angegebene Pfad ist ungültig oder kein Verzeichnis."
     }
 }
+
+function Assert-FileNotOccupied {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Path
+    )
+    if (Test-Path $Path) {
+        try {
+            $stream = [System.IO.File]::Open($Path, 'Open', 'ReadWrite', 'None')
+            $stream.Close()
+        } catch {
+            throw "Die Datei '$Path' wird gerade verwendet und kann nicht überschrieben werden."
+        }
+    }
+}
+
+
+# EXCEL
+
+function Save-ExcelFile {
+    param(
+        [Parameter(Mandatory)]
+        [Array]$Data,
+
+        [Parameter(Mandatory)]
+        [string]$Path,
+
+        [string]$SheetName = "Sheet1",
+
+        [switch]$Append
+    )
+
+    Assert-FileNotOccupied -Path $Path
+
+    $exportParams = @{
+        Path         = $Path
+        WorkSheetname = $SheetName
+        AutoSize     = $true
+        BoldTopRow   = $true
+        TableStyle   = "None"
+        TableName    = $SheetName
+    }
+
+    if ($Append) {
+        $exportParams.Append = $true
+    } else {
+        $exportParams.ClearSheet = $true
+    }
+
+    $Data | Export-Excel @exportParams
+}
