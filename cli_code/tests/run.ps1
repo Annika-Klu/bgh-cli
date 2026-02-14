@@ -17,8 +17,8 @@ $failedTotal = 0
 
 foreach ($file in $testFiles) {
     $parts = ($file.BaseName -split "\.")
-    $commandName = $parts[1]
-
+    $commandNameRaw = $parts[1]
+    $commandName = ($commandNameRaw -replace "-", " ").Trim()
 
     try {
         Write-Host "`n--------------------------"

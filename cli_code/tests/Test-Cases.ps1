@@ -37,7 +37,8 @@
             # no console outputs
             #& "$PSScriptRoot\..\$mainCommand.ps1" $CommandName @arguments *>$null 2>&1
             
-            $output = & "$PSScriptRoot\..\bgh.ps1" $CommandName @arguments *>&1
+            $commandParts = $commandName.Split(" ")
+            $output = & "$PSScriptRoot\..\bgh.ps1" @CommandParts @arguments *>&1
             $fullOutput = $output -join "`n"
             
             $actualExitCode = $LASTEXITCODE
