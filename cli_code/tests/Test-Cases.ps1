@@ -26,6 +26,12 @@
             }
         }
 
+        if ($testCase.ContainsKey("Flags") -and $testCase.Flags) {
+            $arguments += $testCase.Flags
+        }
+
+        $arguments += "TESTMODE"
+
         $testName = if ($testCase.ContainsKey("Name")) { $testCase.Name } else { "(unnamed test)" }
         Write-Host "$testNo. '$($testName)'" -ForegroundColor White
 

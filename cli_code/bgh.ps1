@@ -4,6 +4,9 @@
     [string[]]$AdditionalArgs
 )
 
+$global:CLI_TESTMODE = $AdditionalArgs -contains "TESTMODE"
+$AdditionalArgs = $AdditionalArgs | Where-Object { $_ -ne "TESTMODE" }
+
 Set-Location -Path $PSScriptRoot
 
 . "$PSScriptRoot/preflight/run.ps1" -Command $Command
@@ -17,6 +20,10 @@ try {
         Out-Message "Bitte Befehl eingeben und mit der Eingabetaste bestätigen."
         Use-MentionHelp
         exit 1
+    }
+
+    if ($Command -eq "init") {
+        Out-Message "CLI eingerichtet und bereit"
     }
 
     Set-Variable -Name "BASE_CMD" -Value $Command -Scope Global
