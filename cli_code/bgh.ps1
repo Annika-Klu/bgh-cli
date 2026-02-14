@@ -14,7 +14,7 @@ function Use-MentionHelp {
 
 try {
     if (-not $Command) {
-        Out-Message "Bitte Befehl eingeben und mit der Eingabetaste bestÃ¤tigen."
+        Out-Message "Bitte Befehl eingeben und mit der Eingabetaste bestätigen."
         Use-MentionHelp
         exit 1
     }
