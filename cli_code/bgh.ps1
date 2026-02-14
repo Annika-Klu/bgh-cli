@@ -22,10 +22,6 @@ try {
         exit 1
     }
 
-    if ($Command -eq "init") {
-        Out-Message "CLI eingerichtet und bereit"
-    }
-
     Set-Variable -Name "BASE_CMD" -Value $Command -Scope Global
 
     $parsedCmd = @{}

@@ -19,6 +19,8 @@
 
         $helpItems = foreach ($cmd in $group.Group | Sort-Object Name) {
             $name = $cmd.BaseName
+            if ($name -like "*[system]*") { continue }
+
             $descFile = $cmd.FullName -replace "\.ps1$", ".md"
 
             if (Test-Path $descFile) {
