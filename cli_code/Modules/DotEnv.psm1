@@ -1,4 +1,4 @@
-$EnvPath = Join-Path $PWD ".env"
+﻿$EnvPath = Join-Path $PWD ".env"
 
 function Get-DotEnv {
     if (-Not (Test-Path $EnvPath)) {

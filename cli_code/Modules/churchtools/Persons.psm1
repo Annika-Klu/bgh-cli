@@ -1,4 +1,4 @@
-function Get-Birthdays {
+﻿function Get-Birthdays {
     param(
         [Datetime]$From,
         [Datetime]$To
@@ -28,7 +28,7 @@ function Get-PersonsBackupData {
     )
 
     $ct = [ChurchTools]::new($CT_API_URL)
-    Out-Message "Berücksichtige folgende Status: $($StatusNames -join ', ')"
+    Out-Message "BerÃ¼cksichtige folgende Status: $($StatusNames -join ', ')"
 
     $statuses = $ct.PaginateRequest("statuses", 10)
     $statusIds = $statuses | Where-Object { $StatusNames -contains $_.nameTranslated } | Select-Object -Expand id

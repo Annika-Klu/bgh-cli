@@ -1,4 +1,4 @@
-$GitHubHeaders = @{ Authorization = "" }
+﻿$GitHubHeaders = @{ Authorization = "" }
 
 function Get-LatestRelease {
     param(
@@ -29,11 +29,11 @@ function Get-ReleaseAsset {
     $assetsResponse = Invoke-WebRequest -Uri $Release.assets_url -Headers $GitHubHeaders -UseBasicParsing
     $assets = $assetsResponse.Content | ConvertFrom-Json
     if ($assets.Count -eq 0) {
-        throw "Keine Assets für Release $($Release.tag_name) gefunden."
+        throw "Keine Assets fÃ¼r Release $($Release.tag_name) gefunden."
     }
     $asset = $assets | Where-Object { $_.name -eq $AssetName }
     if (-not $asset) {
-        throw "$AssetName wurde nicht in den Assets für Release $($Release.tag_name) gefunden."
+        throw "$AssetName wurde nicht in den Assets fÃ¼r Release $($Release.tag_name) gefunden."
     }
     return $asset
 }

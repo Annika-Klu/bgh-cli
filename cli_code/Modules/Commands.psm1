@@ -1,4 +1,4 @@
-function Get-ParsedCmd {
+﻿function Get-ParsedCmd {
     param (
         [string]$ArgsStr
     )

@@ -1,4 +1,4 @@
-function Show-Help {
+﻿function Show-Help {
     Out-Message "`nLISTE DER BEFEHLE"
 
     $allowedCommands = Get-AllowedCommands

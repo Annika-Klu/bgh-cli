@@ -1,4 +1,4 @@
-function Save-EventFiles {
+﻿function Save-EventFiles {
     param(
         [datetime]$ForDate = $(Get-Date),
         [string]$SaveDir
@@ -17,7 +17,7 @@ function Save-EventFiles {
         foreach ($file in $files) {
             $filePath = Join-Path $SaveDir $file.title
             if (Test-Path $filePath) { continue }
-            Write-Host "Lade $($file.title) für $($event.name) herunter..."
+            Write-Host "Lade $($file.title) fÃ¼r $($event.name) herunter..."
             $ct.CallApi("GET", $file.frontendUrl, $null, $filePath)
         }
     }

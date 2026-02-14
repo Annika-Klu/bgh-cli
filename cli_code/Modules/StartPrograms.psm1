@@ -1,4 +1,4 @@
-function Start-OBS {
+﻿function Start-OBS {
     $obsPath = "C:\Program Files\obs-studio\bin\64bit\obs64.exe"
     if (Test-Path $obsPath) {
         Start-Process -FilePath $obsPath -WorkingDirectory (Split-Path $obsPath)

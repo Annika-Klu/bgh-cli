@@ -1,4 +1,4 @@
-function Get-Songs {
+﻿function Get-Songs {
     $ct = [ChurchTools]::new($CT_API_URL)
     $songs = $ct.PaginateRequest("songs", 100)
     $CtSongs = @()
@@ -77,7 +77,7 @@ function Sync-FromChurchtoolsToLocal {
             }
             continue
         }
-        Out-Message "Speichere (neu) '$($file.name)'"
+        Out-Message "Speichere '$($file.name)'"
         $stats["new"]++
         $ct.CallApi("GET", $file.fileUrl, $null, $savePath) | Out-Null
     }

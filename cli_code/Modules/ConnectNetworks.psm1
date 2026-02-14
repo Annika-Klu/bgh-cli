@@ -1,4 +1,4 @@
-function Connect-BenQNetwork {
+﻿function Connect-BenQNetwork {
     $availableNets = netsh wlan show networks | Select-String "SSID"
     $benqNet = $availableNets | Where-Object { $_ -match "^BenQ.*2$" }
 
@@ -7,6 +7,6 @@ function Connect-BenQNetwork {
         $ssid = $ssidLine.Trim()
         netsh wlan connect name=$ssid | Out-Null
     } else {
-        throw "Nicht gefunden. Beamer vermutlich nicht verfügbar (ausgeschaltet?)."
+        throw "Nicht gefunden. Beamer vermutlich nicht verfÃ¼gbar (ausgeschaltet?)."
     }
 }

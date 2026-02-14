@@ -1,4 +1,4 @@
-function Invoke-UpdateBootstrap {
+﻿function Invoke-UpdateBootstrap {
     param(
         [string]$InstallPath
     )
@@ -44,7 +44,7 @@ function Register-UpdateWorker {
             Move-Item -Path "$KeepDir/*" -Destination $InstallPath -Force
         }
         Remove-Item -Path $PSScriptRoot -Recurse -Force -ErrorAction SilentlyContinue
-        Write-Host "Update erfolgreich abgeschlossen. Die Befehle sind wieder wie gewohnt verfügbar." -ForegroundColor Green
+        Write-Host "Update erfolgreich abgeschlossen. Die Befehle sind wieder wie gewohnt verfÃ¼gbar." -ForegroundColor Green
     } catch {
         Write-Host $_.Exception.Message -ForegroundColor Red
     }
@@ -73,11 +73,11 @@ function Register-UninstallWorker {
         Remove-Item -Path $InstallPath -Recurse -Force -ErrorAction Stop
 
         if (Test-Path $CmdShim) {
-            Write-Host "Entferne Befehlsverknüpfung..." -ForegroundColor Green
+            Write-Host "Entferne BefehlsverknÃ¼pfung..." -ForegroundColor Green
             Remove-Item -Path $CmdShim -Recurse -Force -ErrorAction Stop
         }
 
-        Write-Host "Leere temporäres Deinstallationsverzeichnis $PSScriptRoot..."
+        Write-Host "Leere temporÃ¤res Deinstallationsverzeichnis $PSScriptRoot..."
         Remove-Item -Path $PSScriptRoot -Recurse -Force -ErrorAction SilentlyContinue
         Write-Host "BGH-CLI erfolgreich deinstalliert." -ForegroundColor Green
     } catch {

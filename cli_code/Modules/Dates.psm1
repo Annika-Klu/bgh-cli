@@ -1,4 +1,4 @@
-function Get-ApiDate {
+﻿function Get-ApiDate {
     param(
         [datetime]$Date
     )
@@ -53,7 +53,7 @@ function Get-QuarterDates {
             break
         }
         default {
-            Throw "Ungültiges Quartal: $Quarter"
+            Throw "UngÃ¼ltiges Quartal: $Quarter"
         }
     }
 

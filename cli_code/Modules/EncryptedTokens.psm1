@@ -1,4 +1,4 @@
-function Save-EncryptedToken {
+﻿function Save-EncryptedToken {
     param (
         [Parameter(Mandatory)]
         [string]$Token,

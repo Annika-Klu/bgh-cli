@@ -1,4 +1,4 @@
-function Get-Wikis {
+﻿function Get-Wikis {
     $ct = [ChurchTools]::new($CT_API_URL)
     return $ct.PaginateRequest("wiki/categories", 100)
 }
