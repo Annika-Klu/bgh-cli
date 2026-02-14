@@ -22,43 +22,37 @@
         if ($testCase.ContainsKey("Arguments") -and $testCase.Arguments) {
             foreach ($key in $testCase.Arguments.Keys) {
                 $value = $testCase.Arguments[$key]
-                if ($value -is [bool] -and $value) {
-                    $arguments += "-$key"
-                } else {
-                    $arguments += "-$key"
-                    $arguments += $value
-                }
+                $arguments += "$key=$value"
             }
         }
 
         $testName = if ($testCase.ContainsKey("Name")) { $testCase.Name } else { "(unnamed test)" }
         Write-Host "$testNo. '$($testName)'" -ForegroundColor White
+
         try {
-            # no console outputs
-            #& "$PSScriptRoot\..\$mainCommand.ps1" $CommandName @arguments *>$null 2>&1
-            
-            $commandParts = $commandName.Split(" ")
-            $output = & "$PSScriptRoot\..\bgh.ps1" @CommandParts @arguments *>&1
+            $commandParts = $CommandName.Trim().Split(" ")
+
+            $output = & "$PSScriptRoot\..\bgh.ps1" @commandParts @arguments *>&1
             $fullOutput = $output -join "`n"
-            
+
             $actualExitCode = $LASTEXITCODE
+
             $failure = $false
-            $failureMessage = ""
 
             if ($actualExitCode -ne $expectedExitCode) {
-                Write-Host ("- Expected exit code {0} but is {1}" -f $expectedExitCode, $actualExitCode) -ForegroundColor Red
+                Write-Host ("- Expected exit code {0} but got {1}" -f $expectedExitCode, $actualExitCode) -ForegroundColor Red
                 $failure = $true
             } else {
                 Write-Host "- Exit code is $expectedExitCode" -ForegroundColor White
             }
 
-            if ($testCase.ContainsKey("ExpectedMessage")) {
+            if ($testCase.ContainsKey("ExpectedMessage") -and $testCase.ExpectedMessage) {
                 $expectedMsg = [regex]::Escape($testCase.ExpectedMessage)
                 if (-not ($fullOutput -match $expectedMsg)) {
-                    Write-Host "- Expected message '$($testCase.ExpectedMessage)' not found" -ForegroundColor Red
+                    Write-Host ("- Expected message '{0}' not found" -f $testCase.ExpectedMessage) -ForegroundColor Red
                     $failure = $true
                 } else {
-                    Write-Host "- Results in expected message '$($testCase.ExpectedMessage)'" -ForegroundColor White
+                    Write-Host ("- Expected message '{0}'" -f $testCase.ExpectedMessage) -ForegroundColor White
                 }
             }
 
@@ -66,15 +60,15 @@
                 $failed++
                 Write-Host "❌ Failed" -ForegroundColor Red
             } else {
-                Write-Host "✅ Passed" -ForegroundColor Green
                 $passed++
+                Write-Host "✅ Passed" -ForegroundColor Green
             }
 
         } catch {
-            Write-Host ("Exception beim Test {0}: {1}" -f $testName, $_) -ForegroundColor Red
+            Write-Host ("Exception in test '{0}': {1}" -f $testName, $_) -ForegroundColor Red
             $failed++
         }
-        Write-Host ""
     }
-   return ($passed, $failed)
+
+    return ($passed, $failed)
 }
