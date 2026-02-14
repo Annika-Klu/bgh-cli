@@ -53,7 +53,7 @@ function Get-QuarterDates {
             break
         }
         default {
-            Throw "UngÃ¼ltiges Quartal: $Quarter"
+            Throw "Ungültiges Quartal: $Quarter"
         }
     }
 

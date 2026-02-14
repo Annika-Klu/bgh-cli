@@ -8,7 +8,7 @@ function Set-ApiUrl {
         }
         $churchUrl = "https://$subdomain.church.tools"
 
-        $errorMsg = "UngÃ¼ltige Eingabe: '$subdomain.church.tools' existiert nicht."
+        $errorMsg = "Ungültige Eingabe: '$subdomain.church.tools' existiert nicht."
 
         try {
             $response = Invoke-WebRequest -Uri $churchUrl -TimeoutSec 5 -ErrorAction Stop -UseBasicParsing
@@ -39,7 +39,7 @@ function Save-ApiToken {
             Save-EncryptedToken -Token $pastedToken -Path (Join-Path $PWD "ctlogintoken.sec")
             $isValid = $true
         } catch {
-            Out-Message "Das Token ist ungÃ¼ltig. $_" error
+            Out-Message "Das Token ist ungültig. $_" error
             $isValid = $false
         }
     } until ($isValid)
@@ -48,14 +48,14 @@ function Save-ApiToken {
 function Set-OutDir {
     $suggestedOutDir = "$($env:USERPROFILE)\Documents"
     do {
-        $selectedOutDir = Read-Host "Wo sollen heruntergeladene oder generierte Dateien gespeichert werden? (Ohne Eingabe bestÃ¤tigen fÃ¼r '$suggestedOutDir')"
+        $selectedOutDir = Read-Host "Wo sollen heruntergeladene oder generierte Dateien gespeichert werden? (Ohne Eingabe bestätigen für '$suggestedOutDir')"
         if (-not $selectedOutDir) {
             return $suggestedOutDir
         }
         if (Test-Path $selectedOutDir) {
             $isValid = $true
         } else {
-            Out-Message "UngÃ¼ltiger Pfad." error
+            Out-Message "Ungültiger Pfad." error
             $isValid = $false
         }
     } until ($isValid)
@@ -63,12 +63,12 @@ function Set-OutDir {
 }
 
 $initialSetupInfo = @"
-FÃ¼r die Ersteinrichtung brauchst du dein Churchtools-Login-Token. Um es zu finden, 
+Für die Ersteinrichtung brauchst du dein Churchtools-Login-Token. Um es zu finden, 
 - suche in Churchtools unter 'Personen' deinen eigenen Datensatz und klicke ihn an.
 - Klicke auf 'Berechtigungen'. 
 - Im dann angezeigten Fenseter klicke auf 'Login-Token' und kopiere das angezeigte Token (Strg + C ist am einfachsten).
-- Wenn das CLI dich auffordert, gib dein Token ein. Per Rechtsklick in die Powershell-Konsole werden kopierte Inhalte eingefÃ¼gt.
-- BestÃ¤tige mit Eingabetaste.
+- Wenn das CLI dich auffordert, gib dein Token ein. Per Rechtsklick in die Powershell-Konsole werden kopierte Inhalte eingefügt.
+- Bestätige mit Eingabetaste.
 "@
 
 function Show-UserAndAddToGroup {
@@ -93,7 +93,7 @@ function Set-CliEnv {
     $envVars["OUT_DIR"] = Set-OutDir
     Update-DotEnv -KeyValuePairs $envVars
     Show-UserAndAddToGroup -ApiUrl $envVars["CT_API_URL"]
-    Out-Message "Danke fÃ¼r deine Angaben! Das CLI ist jetzt fertig konfiguriert."
+    Out-Message "Danke für deine Angaben! Das CLI ist jetzt fertig konfiguriert."
 }
 
 Export-ModuleMember -Function Set-CliEnv, Save-ApiToken, Show-UserAndAddToGroup

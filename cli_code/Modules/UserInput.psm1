@@ -16,7 +16,7 @@
         $response = Read-Host "$Message (j/n)"
         $responseIsValid = $validResponses.ContainsKey($response)
         if (-not $responseIsValid) {
-            Out-Message "UngÃ¼ltige Eingabe, bitte 'j' oder 'n' angeben." -Type "error"
+            Out-Message "Ungültige Eingabe, bitte 'j' oder 'n' angeben." -Type "error"
         }
     } until ($responseIsValid)
 
@@ -54,12 +54,12 @@ function Test-UserInput {
             }
         }
     } catch {
-        throw "Der Wert '$Value' fÃ¼r '$Name' konnte nicht in den Typ '$Type' konvertiert werden."
+        throw "Der Wert '$Value' für '$Name' konnte nicht in den Typ '$Type' konvertiert werden."
     }
 
     if ($ValidValues.Count -gt 0) {
         if ($ValidValues -notcontains $convertedValue) {
-            throw "UngÃ¼ltiger Wert '$Value' fÃ¼r '$Name'. Erlaubte Werte sind: $($ValidValues -join ', ')"
+            throw "Ungültiger Wert '$Value' für '$Name'. Erlaubte Werte sind: $($ValidValues -join ', ')"
         }
     }
 

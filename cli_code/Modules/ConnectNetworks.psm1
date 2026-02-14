@@ -7,6 +7,6 @@
         $ssid = $ssidLine.Trim()
         netsh wlan connect name=$ssid | Out-Null
     } else {
-        throw "Nicht gefunden. Beamer vermutlich nicht verfÃ¼gbar (ausgeschaltet?)."
+        throw "Nicht gefunden. Beamer vermutlich nicht verfügbar (ausgeschaltet?)."
     }
 }
