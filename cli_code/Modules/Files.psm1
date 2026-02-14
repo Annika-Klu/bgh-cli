@@ -1,4 +1,4 @@
-function Test-JsonContent {
+﻿function Test-JsonContent {
     param (
         [string]$JsonPath
     )
@@ -21,60 +21,6 @@ function Get-JsonContent {
     
     $content = Get-Content -Path $JsonPath -Raw
     return  $content | ConvertFrom-Json
-}
-
-function Initialize-ExcelObjects {
-    param(
-        [Switch]$Visible
-    )
-    try {
-        $excel = New-Object -ComObject Excel.Application
-    } catch {
-        throw "Excel konnte nicht gestartet werden. Möglicherweise ist es nicht installiert. Fehlermeldung: $_"
-    }
-    $excel.Visible = $Visible
-    $workbook = $excel.Workbooks.Add()
-    return @($excel, $workbook)
-}
-
-function Add-ExcelTableData {
-    param(
-        [Object]$Sheet,
-        [Array]$Headers,
-        [Array]$Data
-    )
-
-    $row = 1
-    for ($col = 0; $col -lt $Headers.Count; $col++) {
-        $Sheet.Cells.Item($row, $col + 1).Value2 = $Headers[$col]
-        $Sheet.Cells.Item($row, $col + 1).Font.Bold = $true
-    }
-
-    $row = 2
-    foreach ($item in $Data) {
-        $col = 1
-        foreach ($key in $item.PSObject.Properties.Name) {
-            if (-not $Headers.contains($key)) { continue }
-            $Sheet.Cells.Item($row, $col).Value2 = $item.$key
-            $col++
-        }
-        $row++
-    }
-}
-
-function Unregister-Excel {
-    param(
-        [Object]$Excel,
-        [Object]$Workbook,
-        [Object]$Sheet
-    )
-    $Workbook.Close($false) | Out-Null
-    $Excel.Quit() | Out-Null
-    [System.Runtime.Interopservices.Marshal]::ReleaseComObject($Sheet) | Out-Null
-    [System.Runtime.Interopservices.Marshal]::ReleaseComObject($Workbook) | Out-Null
-    [System.Runtime.Interopservices.Marshal]::ReleaseComObject($Excel) | Out-Null
-    [GC]::Collect() | Out-Null
-    [GC]::WaitForPendingFinalizers() | Out-Null
 }
 
 function Compress-FilesToZip {
@@ -114,4 +60,104 @@ function Get-DirStats {
     } else {
         Write-Error "Der angegebene Pfad ist ungültig oder kein Verzeichnis."
     }
+}
+
+function Assert-FileNotOccupied {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Path
+    )
+    if (Test-Path $Path) {
+        try {
+            $stream = [System.IO.File]::Open($Path, 'Open', 'ReadWrite', 'None')
+            $stream.Close()
+        } catch {
+            throw "Die Datei '$Path' wird gerade verwendet und kann nicht überschrieben werden."
+        }
+    }
+}
+
+
+# EXCEL
+
+function Save-ExcelFile {
+    param(
+        [Parameter(Mandatory)]
+        [Array]$Data,
+
+        [Parameter(Mandatory)]
+        [string]$Path,
+
+        [string]$SheetName = "Sheet1",
+
+        [switch]$Append
+    )
+
+    Assert-FileNotOccupied -Path $Path
+
+    $exportParams = @{
+        Path         = $Path
+        WorkSheetname = $SheetName
+        AutoSize     = $true
+        BoldTopRow   = $true
+        TableStyle   = "None"
+        TableName    = $SheetName
+    }
+
+    if ($Append) {
+        $exportParams.Append = $true
+    } else {
+        $exportParams.ClearSheet = $true
+    }
+
+    $Data | Export-Excel @exportParams
+}
+
+$ExcelColors = @{
+    LightGray  = [System.Drawing.Color]::FromArgb(242, 242, 242) # Hellgrau
+    Yellow  = [System.Drawing.Color]::FromArgb(255, 255, 0)   # Gelb
+    Red    = [System.Drawing.Color]::FromArgb(255, 0, 0)     # Rot
+}
+
+function Set-HighlightColors {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Path,
+
+        [Parameter(Mandatory)]
+        [string]$SheetName,
+
+        [Parameter(Mandatory)]
+        [int[]]$Rows,
+
+        [int[]]$Cols = $null,
+
+        [string]$ColorKey = "Yellow"
+    )
+
+    if (-not $ExcelColors.ContainsKey($ColorKey)) {
+        throw "ColorKey '$ColorKey' ist nicht definiert. Verfügbar: $($ExcelColors.Keys -join ', ')"
+    }
+
+    $color = $ExcelColors[$ColorKey]
+
+    $excelPackage = Open-ExcelPackage -Path $Path
+    $worksheet = $excelPackage.Workbook.Worksheets[$SheetName]
+    
+    if (-not $Cols) {
+        $colStart = $worksheet.Dimension.Start.Column
+        $colEnd   = $worksheet.Dimension.End.Column
+        $Cols = $colStart..$colEnd
+    }
+
+    foreach ($row in $Rows) {
+        $colStart = $Cols[0]
+        $colEnd = $Cols[-1]
+        $range = $worksheet.Cells[$row, $colStart, $row, $colEnd]
+
+        $range.Style.Fill.PatternType = "Solid"
+        $range.Style.Fill.BackgroundColor.SetColor($Color)
+    }
+
+    Close-ExcelPackage $excelPackage
 }

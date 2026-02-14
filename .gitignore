@@ -1,12 +1,17 @@
 *.ps1xml
-*.tmp
-*.user
-*.cache
+
+# env files
 .env*
 !.env.example
-*.sec
 
+# logs
 logs
 *.log
 
+# secure, temp and backup files
 .usercache*.json
+*.sec
+.bak
+*.tmp
+*.user
+*.cache

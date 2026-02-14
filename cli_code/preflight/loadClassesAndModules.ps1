@@ -1,4 +1,4 @@
-$classesPath = Join-Path $PWD "Classes"
+﻿$classesPath = Join-Path $PWD "Classes"
 Get-ChildItem -Path $classesPath -Filter *.ps1 | ForEach-Object {
     . $_.FullName
 }

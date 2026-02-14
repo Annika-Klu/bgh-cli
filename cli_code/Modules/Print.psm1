@@ -1,4 +1,4 @@
-function Out-Message {
+﻿function Out-Message {
     param (
         [string]$Message,
         [ValidateSet("info", "warning", "error", "debug")]

@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string]$Command
 )
 
@@ -6,8 +6,13 @@ param(
 . "$PSScriptRoot/installRequirements.ps1"
 
 function Set-Encoding {
-    [Console]::OutputEncoding = [Text.UTF8Encoding]::new()
-    [Console]::InputEncoding = [Text.UTF8Encoding]::new()
+    chcp 65001 > $null
+
+    $utf8 = New-Object System.Text.UTF8Encoding $false
+
+    [Console]::InputEncoding  = $utf8
+    [Console]::OutputEncoding = $utf8
+    $OutputEncoding = $utf8
 }
 
 function Test-PSVersion {
@@ -36,6 +41,27 @@ function Test-CliVersion {
     }
 }
 
+function Write-PreflightError {
+    param(
+        [Parameter(Mandatory)]
+        [string]$ErrMsg
+    )
+
+    $fileName = "bgh-cli.startfehler.txt"
+    try {
+        Write-Host "Fehler bei CLI-Start $ErrMsg"
+        $desktop = [Environment]::GetFolderPath("Desktop")
+        $logFile = Join-Path $desktop $fileName
+
+        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        $entry = "[$timestamp] $ErrMsg"
+
+        Add-Content -Path $logFile -Value $entry
+    } catch {
+        Write-Host "FEHLER beim Schreiben in $($fileName): $($ErrMsg)"
+    }
+}
+
 $initFile = Join-Path $PWD "init"
 
 try {
@@ -49,6 +75,5 @@ try {
     Test-PSVersion
     if ($Command -ne "update") { Test-CliVersion }
 } catch {
-    Write-ErrorMessage -Log $log -ErrMsg "ERROR in preflight run: $($_.Exception.Message)"
-    Out-Message "ACHTUNG: $($_.Exception.Message)"-Type "warning"
+    Write-PreflightError -ErrMsg "ERROR in preflight run: $($_.Exception.Message)"
 }

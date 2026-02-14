@@ -1,4 +1,4 @@
-function Get-ApiDate {
+﻿function Get-ApiDate {
     param(
         [datetime]$Date
     )

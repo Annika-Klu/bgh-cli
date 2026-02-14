@@ -1,4 +1,4 @@
-function Invoke-UpdateBootstrap {
+﻿function Invoke-UpdateBootstrap {
     param(
         [string]$InstallPath
     )

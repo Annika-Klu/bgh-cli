@@ -1,4 +1,4 @@
-try {
+﻿try {
     $version = $VERSION
     $latestRelease = Get-LatestRelease -GitHubToken $GH_TOKEN -ReleasesUrl $RELEASES_URL
     if ($version -eq $latestRelease.tag_name) {

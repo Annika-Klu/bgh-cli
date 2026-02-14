@@ -1,4 +1,4 @@
-try {
+﻿try {
     Out-Message "ACHTUNG: Dies kann nicht rückgängig gemacht werden. Um das CLI danach wieder zu nutzen, musst du es erneut installieren." -Type "warning"
     $uninstall = Get-YesOrNo "Deinstallieren?"
     if (-not $uninstall) {

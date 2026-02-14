@@ -1,4 +1,4 @@
-function Get-YesOrNo {
+﻿function Get-YesOrNo {
     param (
         [Parameter(Mandatory=$true)]
         [String]$Message

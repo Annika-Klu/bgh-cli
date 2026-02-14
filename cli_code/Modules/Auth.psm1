@@ -1,4 +1,4 @@
-Import-Module "$PSScriptRoot\DotEnv.psm1"
+﻿Import-Module "$PSScriptRoot\DotEnv.psm1"
 
 function Set-ApiUrl {
     do {
@@ -11,7 +11,7 @@ function Set-ApiUrl {
         $errorMsg = "Ungültige Eingabe: '$subdomain.church.tools' existiert nicht."
 
         try {
-            $response = Invoke-WebRequest -Uri $churchUrl -TimeoutSec 5 -ErrorAction Stop
+            $response = Invoke-WebRequest -Uri $churchUrl -TimeoutSec 5 -ErrorAction Stop -UseBasicParsing
             $body = $response.Content
             if ($body -match "Finde deine Gemeinde") {
                 Out-Message $errorMsg error

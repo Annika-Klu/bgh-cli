@@ -1,4 +1,4 @@
-class ChurchTools {
+﻿class ChurchTools {
     [string]$BaseUrl
     [object]$Headers
     [pscustomobject]$User
@@ -35,10 +35,10 @@ class ChurchTools {
 
         if ($OutFile) {
             $params['OutFile'] = $OutFile
-            Invoke-WebRequest @params
+            Invoke-WebRequest @params -UseBasicParsing
             return $OutFile
         } else {
-            $response = Invoke-WebRequest @params
+            $response = Invoke-WebRequest @params -UseBasicParsing
             return $response.Content | ConvertFrom-Json
         }
     }

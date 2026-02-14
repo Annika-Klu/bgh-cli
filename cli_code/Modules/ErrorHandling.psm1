@@ -1,4 +1,4 @@
-function Send-ErrorReport {
+﻿function Send-ErrorReport {
     param(
         [string]$ErrMsg
     )

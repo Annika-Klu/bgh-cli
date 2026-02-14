@@ -1,4 +1,4 @@
-function Save-EventFiles {
+﻿function Save-EventFiles {
     param(
         [datetime]$ForDate = $(Get-Date),
         [string]$SaveDir

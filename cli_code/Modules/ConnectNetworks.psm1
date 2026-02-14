@@ -1,4 +1,4 @@
-function Connect-BenQNetwork {
+﻿function Connect-BenQNetwork {
     $availableNets = netsh wlan show networks | Select-String "SSID"
     $benqNet = $availableNets | Where-Object { $_ -match "^BenQ.*2$" }
 

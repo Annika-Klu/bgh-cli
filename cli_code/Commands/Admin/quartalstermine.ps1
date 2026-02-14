@@ -1,4 +1,4 @@
-function Assert-AppointmentsFile {
+﻿function Assert-AppointmentsFile {
     param(
         [String]$FilePath
     )
@@ -160,8 +160,8 @@ function Get-AppointmentDates {
                 $datetime = Get-Date -Year $day.Year -Month $day.Month -Day $day.Day -Hour $hours -Minute $minutes
                 $allAppointments += [PSCustomObject]@{
                     Name     = $name
-                    DatumObjekt = $datetime
-                    Datum    = $datetime.ToString("dd.MM.")
+                    Datum    = $datetime.Date
+                    TagMonat = $datetime.ToString("dd.MM.")
                     Uhrzeit  = $datetime.ToString("HH:mm")
                     Wochentag = $datetime.ToString("ddd", [System.Globalization.CultureInfo]::GetCultureInfo("de-DE"))
                 }
@@ -173,54 +173,54 @@ function Get-AppointmentDates {
 
 function Save-DataToExcel {
     param(
+        [Parameter(Mandatory)]
         [Array]$Birthdays,
+
+        [Parameter(Mandatory)]
         [Array]$Appointments,
-        [String]$SaveFileName
+
+        [Parameter(Mandatory)]
+        [string]$SaveFileName
     )
-    
-    $excel, $workbook = Initialize-ExcelObjects
-    $birthdaysSheet = $workbook.Worksheets.Item(1)
-    $birthdaysSheet.Name = "Geburtstage"
 
-    $birthdayHeaders = @("Name", "Tag")
-    Add-ExcelTableData -Sheet $birthdaysSheet -Headers $birthdayHeaders -Data $Birthdays
+    $finalFilePath = Join-Path $OUT_DIR $SaveFileName
 
-    $appointmentsSheet = $workbook.Worksheets.Add()
-    $appointmentsSheet.Name = "Termine"
+    $birthdayHeaders = @("Name","Tag")
+    Save-ExcelFile -Data $Birthdays -Path $finalFilePath -SheetName "Geburtstage"
 
-    $federalStates = @("HH", "SH")
+    $appointmentsSheetName = "Termine"
+    $federalStates = @("HH","SH")
     $holidays = [Holidays]::new($federalStates)
 
-    $appointmentsHeaders = @("Name", "Datum", "Uhrzeit", "Wochentag", "Anmerkung")
-    $appointmentsData = $Appointments | Sort-Object DatumObjekt
-    
-    Add-ExcelTableData -Sheet $appointmentsSheet -Headers $appointmentsHeaders -Data $appointmentsData
-    
-    $row = 2
-    foreach ($appointment in $appointmentsData) {
-        $appointmentDate = $appointment.DatumObjekt.Date
+    $appointmentsData = $Appointments | Sort-Object Datum
+
+    foreach ($row in $appointmentsData) {
+        $appointmentDate = $row.Datum
         $isPublicHoliday = $holidays.IsPublicHoliday($appointmentDate)
         $isSchoolHoliday = $holidays.IsSchoolHoliday($appointmentDate)
 
-        $cellRange = $appointmentsSheet.Range("A$($row):E$($row)")
-
-        $yellow = 65535
-        if ($isSchoolHoliday -or $isPublicHoliday)  {
-            $cellRange.Interior.Color = $yellow
+        if ($isPublicHoliday -or $isSchoolHoliday) {
             $holiday = if ($isPublicHoliday) { $isPublicHoliday } else { $isSchoolHoliday }
             $msg = "$($holiday.name) ($($holiday.location))"
-            $appointmentsSheet.Cells.Item($row, 5).Value2 = $msg
+
+            $row | Add-Member -MemberType NoteProperty -Name IsHoliday -Value $true
+            $row | Add-Member -MemberType NoteProperty -Name Anmerkung -Value $msg
+        } else {
+            $row | Add-Member -MemberType NoteProperty -Name IsHoliday -Value $false
+            $row | Add-Member -MemberType NoteProperty -Name Anmerkung -Value ""
         }
-        $row++
     }
 
-    $appointmentsSheet.Columns.AutoFit()
+    $appointmentsToSave = $appointmentsData | Select-Object Name, Datum, Uhrzeit, Wochentag, Anmerkung 
+    Save-ExcelFile -Data $appointMentsToSave -Path $finalFilePath -SheetName $appointmentsSheetName
 
-    $finalFilePath = Join-Path $OUT_DIR $SaveFileName
-    $workbook.SaveAs($finalFilePath) | Out-Null
-    $workbook.Saved = $true
-    
-    Unregister-Excel -Excel $excel -Workbook $workbook -Sheet $appointmentsSheet
+    $rowsToHighlight = @()
+    for ($i = 0; $i -lt $appointmentsData.Count; $i++) {
+        if ($appointmentsData[$i].Anmerkung -and $appointmentsData[$i].Anmerkung.Trim() -ne "") {
+            $rowsToHighlight += $i + 2
+        }
+    }
+    Set-HighlightColors -Path $finalFilePath -SheetName $appointmentsSheetName -Rows $rowsToHighlight
 
     return [System.IO.Path]::GetFullPath($finalFilePath)
 }
@@ -241,12 +241,13 @@ try {
     $startDate, $endDate = Get-QuarterDates -Quarter $quarter -Year $year
 
     $birthdays = Get-Birthdays -From $startDate -To $endDate
-    Out-Message "$($birthdays.Count) Geburtstage gefunden."
+    Out-Message "$($birthdays.Count) Geburtstage gefunden:"
+    $birthdays | Sort-Object Tag | Select-Object Name, Tag | Format-Table -AutoSize
     Out-Line
     
     $appointments = Get-AppointmentDates -FilePath $configFilePath -StartDate $startDate
     Out-Message "Generierte Termine:"
-    $appointments | Sort-Object DatumObjekt | Select-Object Name, Datum, Uhrzeit, Wochentag | Format-Table -AutoSize
+    $appointments | Sort-Object Datum | Select-Object Name, TagMonat, Uhrzeit, Wochentag | Format-Table -AutoSize
 
     $returnValues = Save-DataToExcel -Birthdays $birthdays -Appointments $appointments -SaveFileName $saveFileName
     $excelFilePath = $returnValues | Where-Object { Test-Path $_ }

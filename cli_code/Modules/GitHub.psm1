@@ -1,4 +1,4 @@
-$GitHubHeaders = @{ Authorization = "" }
+﻿$GitHubHeaders = @{ Authorization = "" }
 
 function Get-LatestRelease {
     param(
@@ -7,7 +7,7 @@ function Get-LatestRelease {
     )
     $GitHubHeaders["Authorization"] = "Bearer $GitHubToken"
     try {
-        $response = Invoke-WebRequest -Uri $ReleasesUrl -Headers $GitHubHeaders
+        $response = Invoke-WebRequest -Uri $ReleasesUrl -Headers $GitHubHeaders -UseBasicParsing
     } catch {
         throw "Letzter Release konnte nicht abgefragt werden: $_"
     }
@@ -26,7 +26,7 @@ function Get-ReleaseAsset {
         [string]$AssetName
     )
     $GitHubHeaders["Authorization"] = "Bearer $GitHubToken"
-    $assetsResponse = Invoke-WebRequest -Uri $Release.assets_url -Headers $GitHubHeaders
+    $assetsResponse = Invoke-WebRequest -Uri $Release.assets_url -Headers $GitHubHeaders -UseBasicParsing
     $assets = $assetsResponse.Content | ConvertFrom-Json
     if ($assets.Count -eq 0) {
         throw "Keine Assets für Release $($Release.tag_name) gefunden."

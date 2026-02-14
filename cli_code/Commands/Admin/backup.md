@@ -1,4 +1,4 @@
-Erstellt im konfigurierten Downloadverzeichnis ein Backup
+﻿Erstellt im konfigurierten Downloadverzeichnis ein Backup
 als .zip-Datei mit folgenden Inhalten:
 
 Personen - .csv-Datei mit aktuellen Personendatensätzen

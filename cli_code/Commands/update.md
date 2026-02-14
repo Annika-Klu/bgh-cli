@@ -1,1 +1,1 @@
-Sofern eine neue Version vorhanden ist, wird sie installiert.
+﻿Sofern eine neue Version vorhanden ist, wird sie installiert.

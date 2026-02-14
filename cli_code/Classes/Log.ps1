@@ -1,4 +1,4 @@
-class Log {
+﻿class Log {
     [string]$Name
     [string]$LogsPath
     [string]$FullPath

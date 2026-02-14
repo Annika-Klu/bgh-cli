@@ -1,4 +1,4 @@
-function Get-AllowedCommands {
+﻿function Get-AllowedCommands {
     $allowedCommands = @()
     $ct = [ChurchTools]::new($CT_API_URL)
 

@@ -1,4 +1,4 @@
-function Get-Birthdays {
+﻿function Get-Birthdays {
     param(
         [Datetime]$From,
         [Datetime]$To
@@ -15,7 +15,7 @@ function Get-Birthdays {
         $personShortName = "$($personAttrs.firstName) $($personAttrs.lastName[0])."
         $birthday = [PSCustomObject]@{
             Name = $personShortName
-            Tag = $birthdayDate.ToString("dd.MM.")
+            Tag = $birthdayDate.Date
         }
         $birthdays += $birthday
     }
