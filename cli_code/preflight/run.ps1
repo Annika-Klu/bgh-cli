@@ -6,8 +6,13 @@ param(
 . "$PSScriptRoot/installRequirements.ps1"
 
 function Set-Encoding {
-    [Console]::OutputEncoding = [Text.UTF8Encoding]::new()
-    [Console]::InputEncoding = [Text.UTF8Encoding]::new()
+    chcp 65001 > $null
+
+    $utf8 = New-Object System.Text.UTF8Encoding $false
+
+    [Console]::InputEncoding  = $utf8
+    [Console]::OutputEncoding = $utf8
+    $OutputEncoding = $utf8
 }
 
 function Test-PSVersion {
