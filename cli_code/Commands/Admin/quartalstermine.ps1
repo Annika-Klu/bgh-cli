@@ -39,7 +39,7 @@ function Test-AppointmentsValid {
         if ($appointment.PSObject.Properties.Name -contains "tagmonat") {
             if ($appointment.PSObject.Properties.Name -contains "monatswoche") {
                 $contentValid = $false
-                Out-Message "Eintrag '$($appointment.name)': Wert 'monatswoche' gilt nur in Verbindung mit 'wochentag'. UnzulÃ¤ssig bei 'tagmonat'." -Type "error"
+                Out-Message "Eintrag '$($appointment.name)': Wert 'monatswoche' gilt nur in Verbindung mit 'wochentag'. Unzulässig bei 'tagmonat'." -Type "error"
             }
 
             if ($appointment.tagmonat -notmatch $tagmonatPattern) {
@@ -183,8 +183,6 @@ function Save-DataToExcel {
         [string]$SaveFileName
     )
 
-    Write-Host "YO"
-
     $finalFilePath = Join-Path $OUT_DIR $SaveFileName
 
     $birthdayHeaders = @("Name","Tag")
@@ -216,20 +214,13 @@ function Save-DataToExcel {
     $appointmentsToSave = $appointmentsData | Select-Object Name, DatumObjekt, Uhrzeit, Wochentag, Anmerkung 
     Save-ExcelFile -Data $appointMentsToSave -Path $finalFilePath -SheetName $appointmentsSheetName
 
-    $excelPackage = Open-ExcelPackage -Path $finalFilePath
-    $worksheet = $excelPackage.Workbook.Worksheets[$appointmentsSheetName]
-
-    $yellow = [System.Drawing.Color]::FromArgb(255, 255, 0)
-    $rowIndex = 2
-    foreach ($row in $appointmentsData) {
-        if ($row.IsHoliday) {
-            $worksheet.Cells["A$rowIndex:E$rowIndex"].Style.Fill.PatternType = "Solid"
-            $worksheet.Cells["A$rowIndex:E$rowIndex"].Style.Fill.BackgroundColor.SetColor($yellow)
+    $rowsToHighlight = @()
+    for ($i = 0; $i -lt $appointmentsData.Count; $i++) {
+        if ($appointmentsData[$i].Anmerkung -and $appointmentsData[$i].Anmerkung.Trim() -ne "") {
+            $rowsToHighlight += $i + 2
         }
-        $rowIndex++
     }
-
-    Close-ExcelPackage $excelPackage
+    Set-HighlightColors -Path $finalFilePath -SheetName $appointmentsSheetName -Rows $rowsToHighlight
 
     return [System.IO.Path]::GetFullPath($finalFilePath)
 }

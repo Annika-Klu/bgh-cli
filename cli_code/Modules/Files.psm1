@@ -112,3 +112,52 @@ function Save-ExcelFile {
 
     $Data | Export-Excel @exportParams
 }
+
+$ExcelColors = @{
+    LightGray  = [System.Drawing.Color]::FromArgb(242, 242, 242) # Hellgrau
+    Yellow  = [System.Drawing.Color]::FromArgb(255, 255, 0)   # Gelb
+    Red    = [System.Drawing.Color]::FromArgb(255, 0, 0)     # Rot
+}
+
+function Set-HighlightColors {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Path,
+
+        [Parameter(Mandatory)]
+        [string]$SheetName,
+
+        [Parameter(Mandatory)]
+        [int[]]$Rows,
+
+        [int[]]$Cols = $null,
+
+        [string]$ColorKey = "Yellow"
+    )
+
+    if (-not $ExcelColors.ContainsKey($ColorKey)) {
+        throw "ColorKey '$ColorKey' ist nicht definiert. Verfügbar: $($ExcelColors.Keys -join ', ')"
+    }
+
+    $color = $ExcelColors[$ColorKey]
+
+    $excelPackage = Open-ExcelPackage -Path $Path
+    $worksheet = $excelPackage.Workbook.Worksheets[$SheetName]
+    
+    if (-not $Cols) {
+        $colStart = $worksheet.Dimension.Start.Column
+        $colEnd   = $worksheet.Dimension.End.Column
+        $Cols = $colStart..$colEnd
+    }
+
+    foreach ($row in $Rows) {
+        $colStart = $Cols[0]
+        $colEnd = $Cols[-1]
+        $range = $worksheet.Cells[$row, $colStart, $row, $colEnd]
+
+        $range.Style.Fill.PatternType = "Solid"
+        $range.Style.Fill.BackgroundColor.SetColor($Color)
+    }
+
+    Close-ExcelPackage $excelPackage
+}
