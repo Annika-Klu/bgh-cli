@@ -1,4 +1,4 @@
-class Timer {
+﻿class Timer {
     [datetime]$startTime
     [datetime]$endTime
     [datetime]$Marker

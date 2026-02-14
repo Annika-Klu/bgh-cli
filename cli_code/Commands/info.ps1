@@ -1,4 +1,4 @@
-$ct = [ChurchTools]::new($CT_API_URL)
+﻿$ct = [ChurchTools]::new($CT_API_URL)
 
 try {
     Out-Line

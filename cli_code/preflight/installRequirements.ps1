@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 
 $requirements = Import-PowerShellDataFile -Path "$PWD/requirements.psd1"
 

@@ -1,4 +1,4 @@
-$toast = [Toast]::new()
+﻿$toast = [Toast]::new()
 
 $from = $parsedCmd.Arguments.von
 $to = $parsedCmd.Arguments.nach

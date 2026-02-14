@@ -1,4 +1,4 @@
-class Holidays {
+﻿class Holidays {
     [string[]]$FederalStates
     [object[]]$PublicHolidays = @()
     [object[]]$SchoolHolidays = @()

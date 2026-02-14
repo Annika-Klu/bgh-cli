@@ -1,4 +1,4 @@
-param (
+﻿param (
     [string]$Command,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$AdditionalArgs
@@ -14,7 +14,7 @@ function Use-MentionHelp {
 
 try {
     if (-not $Command) {
-        Out-Message "Bitte Befehl eingeben und mit der Eingabetaste bestätigen."
+        Out-Message "Bitte Befehl eingeben und mit der Eingabetaste bestÃ¤tigen."
         Use-MentionHelp
         exit 1
     }

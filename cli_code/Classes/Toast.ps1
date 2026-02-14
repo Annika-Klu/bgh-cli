@@ -1,4 +1,4 @@
-class Toast {
+﻿class Toast {
     [char]$InfoIcon = [char]9989
     [char]$ErrorIcon = [char]0x274C
 

@@ -1,4 +1,4 @@
-function Assert-AppointmentsFile {
+﻿function Assert-AppointmentsFile {
     param(
         [String]$FilePath
     )
@@ -39,7 +39,7 @@ function Test-AppointmentsValid {
         if ($appointment.PSObject.Properties.Name -contains "tagmonat") {
             if ($appointment.PSObject.Properties.Name -contains "monatswoche") {
                 $contentValid = $false
-                Out-Message "Eintrag '$($appointment.name)': Wert 'monatswoche' gilt nur in Verbindung mit 'wochentag'. Unzulässig bei 'tagmonat'." -Type "error"
+                Out-Message "Eintrag '$($appointment.name)': Wert 'monatswoche' gilt nur in Verbindung mit 'wochentag'. UnzulÃ¤ssig bei 'tagmonat'." -Type "error"
             }
 
             if ($appointment.tagmonat -notmatch $tagmonatPattern) {

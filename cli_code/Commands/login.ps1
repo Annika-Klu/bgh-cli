@@ -1,4 +1,4 @@
-try {
+﻿try {
     $ct = [ChurchTools]::new($CT_API_URL)
     Out-Message "ACHTUNG: Hierdurch werden die Daten des aktuell angemeldeten Nutzers $($ct.User.firstName) $($ct.User.lastName) gelöscht. " -Type "warning"
     $switchUser = Get-YesOrNo "Mit anderem Benutzer anmelden?"

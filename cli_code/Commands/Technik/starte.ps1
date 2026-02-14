@@ -1,4 +1,4 @@
-$toast = [Toast]::new()
+﻿$toast = [Toast]::new()
 
 $device = $null
 $validDevices = @("pc", "notebook")

@@ -1,4 +1,4 @@
-$relevantStatuses = @("Mitglied", "Freund", "Interessent", "Gast")
+﻿$relevantStatuses = @("Mitglied", "Freund", "Interessent", "Gast")
 
 $backupName = "churchtools_backup_$(Get-FileTimestamp)"
 $tempBackupDir = Join-Path $env:TEMP $backupName

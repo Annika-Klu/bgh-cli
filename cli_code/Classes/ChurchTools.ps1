@@ -1,4 +1,4 @@
-class ChurchTools {
+﻿class ChurchTools {
     [string]$BaseUrl
     [object]$Headers
     [pscustomobject]$User
