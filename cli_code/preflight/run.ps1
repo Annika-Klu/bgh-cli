@@ -65,7 +65,7 @@ function Write-PreflightError {
 $initFile = Join-Path $PWD "init"
 
 try {
-    if ((Test-Path $initFile) -or ($Command -eq "init")) {
+    if ((Test-Path $initFile) -or ($Command -eq "init[system]")) {
         Get-DotEnv
         Set-CliEnv
         Remove-Item $initFile -ErrorAction SilentlyContinue
