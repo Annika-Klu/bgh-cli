@@ -11,7 +11,10 @@
     $passed = 0
     $failed = 0
 
+    $testNo = 0
     foreach ($testCase in $Cases) {
+        Write-Host ""
+        $testNo++
 
         $arguments = @()
         $expectedExitCode = if ($testCase.ContainsKey("ExpectedExitCode")) { $testCase.ExpectedExitCode } else { 0 }
@@ -29,8 +32,7 @@
         }
 
         $testName = if ($testCase.ContainsKey("Name")) { $testCase.Name } else { "(unnamed test)" }
-        Write-Host ("Test '{0}'" -f $testName) -ForegroundColor White
-
+        Write-Host "$testNo. '$($testName)'" -ForegroundColor White
         try {
             # no console outputs
             #& "$PSScriptRoot\..\$mainCommand.ps1" $CommandName @arguments *>$null 2>&1
@@ -43,23 +45,27 @@
             $failureMessage = ""
 
             if ($actualExitCode -ne $expectedExitCode) {
-                $failureMessage = ("Expected exit code {0} but is {1}" -f $expectedExitCode, $actualExitCode)
+                Write-Host ("- Expected exit code {0} but is {1}" -f $expectedExitCode, $actualExitCode) -ForegroundColor Red
                 $failure = $true
+            } else {
+                Write-Host "- Exit code is $expectedExitCode" -ForegroundColor White
             }
 
             if ($testCase.ContainsKey("ExpectedErrorMessage")) {
                 $expectedMsg = [regex]::Escape($testCase.ExpectedErrorMessage)
                 if (-not ($fullOutput -match $expectedMsg)) {
-                    $failureMessage = "Expected error message '$($testCase.ExpectedErrorMessage)' not found"
+                    Write-Host "- Expected error message '$($testCase.ExpectedErrorMessage)' not found" -ForegroundColor Red
                     $failure = $true
+                } else {
+                    Write-Host "- Throws expected error message '$($testCase.ExpectedErrorMessage)'" -ForegroundColor White
                 }
             }
 
             if ($failure) {
                 $failed++
-                Write-Host $failureMessage -ForegroundColor Red
+                Write-Host "❌ Failed" -ForegroundColor Red
             } else {
-                Write-Host "Success" -ForegroundColor Green
+                Write-Host "✅ Passed" -ForegroundColor Green
                 $passed++
             }
 
@@ -67,6 +73,7 @@
             Write-Host ("Exception beim Test {0}: {1}" -f $testName, $_) -ForegroundColor Red
             $failed++
         }
+        Write-Host ""
     }
    return ($passed, $failed)
 }

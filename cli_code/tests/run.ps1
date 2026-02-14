@@ -21,11 +21,11 @@ foreach ($file in $testFiles) {
 
 
     try {
+        Write-Host "`n--------------------------"
         $testCases = . $file.FullName
-        Write-Host ("Running {0} tests for {1}" -f $testCases.Count, $file.Name) -ForegroundColor Cyan
+        Write-Host ("RUNNING TESTS FOR '{0}'" -f $commandName) -ForegroundColor Cyan
         ($passed, $failed) = Test-Cases -Cases $testCases -CommandName $commandName
-        Write-Host ""
-        Write-Host ("Finished tests for {0}. Passed: {1}, Failed: {2}" -f $file.Name, $passed, $failed) -ForegroundColor Cyan
+        Write-Host ("FINISHED TESTS FOR '{0}'. Passed: {1}, Failed: {2}" -f $commandName, $passed, $failed) -ForegroundColor Cyan
         
         $passedTotal += $passed
         $failedTotal += $failed
@@ -38,4 +38,6 @@ foreach ($file in $testFiles) {
 Set-Location $originalLocation
 
 $toalTestsRun = $passedTotal + $failedTotal
-Write-Host "$toalTestsRun tests completed. Passed $passedTotal, failed $failedTotal" -ForegroundColor Cyan
+
+Write-Host "`n--------------------------`n"
+Write-Host "$toalTestsRun TESTS COMPLETED.`nPassed $passedTotal, failed $failedTotal" -ForegroundColor Cyan
