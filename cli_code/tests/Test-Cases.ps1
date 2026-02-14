@@ -52,13 +52,13 @@
                 Write-Host "- Exit code is $expectedExitCode" -ForegroundColor White
             }
 
-            if ($testCase.ContainsKey("ExpectedErrorMessage")) {
-                $expectedMsg = [regex]::Escape($testCase.ExpectedErrorMessage)
+            if ($testCase.ContainsKey("ExpectedMessage")) {
+                $expectedMsg = [regex]::Escape($testCase.ExpectedMessage)
                 if (-not ($fullOutput -match $expectedMsg)) {
-                    Write-Host "- Expected error message '$($testCase.ExpectedErrorMessage)' not found" -ForegroundColor Red
+                    Write-Host "- Expected message '$($testCase.ExpectedMessage)' not found" -ForegroundColor Red
                     $failure = $true
                 } else {
-                    Write-Host "- Throws expected error message '$($testCase.ExpectedErrorMessage)'" -ForegroundColor White
+                    Write-Host "- Results in expected message '$($testCase.ExpectedMessage)'" -ForegroundColor White
                 }
             }
 
