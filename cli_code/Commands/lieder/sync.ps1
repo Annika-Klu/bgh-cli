@@ -10,10 +10,12 @@ function Assert-SyncArg {
     )
     
     $validArgs = ("churchtools", "lokal")
-    $errMsg = "Falsches Argument für '$Key'. Akzeptierte Werte: $($validArgs -join ', ')"
+    $errMsg = "Fehlendes Argument für '$Key'. Akzeptierte Werte: $($validArgs -join ', ')"
     if (-not $Value -or $Value -eq "") {
         throw $errMsg
     }
+
+    $errMsg = $errMsg -replace "Fehlendes", "Falsches"
 
     if ($Value -notin $validArgs) {
         throw $errMsg
