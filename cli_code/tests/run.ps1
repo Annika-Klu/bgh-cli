@@ -23,9 +23,10 @@ foreach ($file in $testFiles) {
     try {
         Write-Host "`n--------------------------"
         $testCases = . $file.FullName
-        Write-Host ("RUNNING TESTS FOR '{0}'" -f $commandName) -ForegroundColor Cyan
+        Write-Host ("`nRUNNING TESTS FOR '{0}'" -f $commandName) -ForegroundColor Cyan
         ($passed, $failed) = Test-Cases -Cases $testCases -CommandName $commandName
-        Write-Host ("FINISHED TESTS FOR '{0}'. Passed: {1}, Failed: {2}" -f $commandName, $passed, $failed) -ForegroundColor Cyan
+        
+        Write-Host ("`nFINISHED | Passed: {1}, Failed: {2}" -f $commandName, $passed, $failed) -ForegroundColor Cyan
         
         $passedTotal += $passed
         $failedTotal += $failed
