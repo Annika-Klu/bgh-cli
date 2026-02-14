@@ -32,6 +32,11 @@
 
         $arguments += "TESTMODE"
 
+        if ($testCase.ContainsKey("HostInputs")) {
+            $hostInputsJson = ($testCase.HostInputs | ConvertTo-Json -Compress)
+            $arguments += "HOSTINPUTS=$hostInputsJson"
+        }
+
         $testName = if ($testCase.ContainsKey("Name")) { $testCase.Name } else { "(unnamed test)" }
         Write-Host "$testNo. '$($testName)'" -ForegroundColor White
 

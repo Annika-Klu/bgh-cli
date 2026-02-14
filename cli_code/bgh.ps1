@@ -4,10 +4,29 @@
     [string[]]$AdditionalArgs
 )
 
-$global:CLI_TESTMODE = $AdditionalArgs -contains "TESTMODE"
-$AdditionalArgs = $AdditionalArgs | Where-Object { $_ -ne "TESTMODE" }
-
 Set-Location -Path $PSScriptRoot
+
+# check for special vars needed for tests
+
+$global:CLI_TESTMODE = $AdditionalArgs -contains "TESTMODE"
+
+$global:CLI_HOSTINPUTS = @{}
+foreach ($arg in $AdditionalArgs) {
+    if ($arg -like "HOSTINPUTS=*") {
+        $json = $arg.Substring(13)
+        try {
+            $global:CLI_HOSTINPUTS = ConvertFrom-Json $json
+        } catch {
+            $global:CLI_HOSTINPUTS = @{}
+        }
+    }
+}
+
+$AdditionalArgs = $AdditionalArgs | Where-Object {
+    ($_ -ne "TESTMODE") -and
+    ($_ -notlike "HOSTINPUTS=*")
+}
+# -----------------------------
 
 . "$PSScriptRoot/preflight/run.ps1" -Command $Command
 
