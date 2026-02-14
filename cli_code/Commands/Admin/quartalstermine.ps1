@@ -160,8 +160,8 @@ function Get-AppointmentDates {
                 $datetime = Get-Date -Year $day.Year -Month $day.Month -Day $day.Day -Hour $hours -Minute $minutes
                 $allAppointments += [PSCustomObject]@{
                     Name     = $name
-                    DatumObjekt = $datetime
-                    Datum    = $datetime.ToString("dd.MM.")
+                    Datum    = $datetime.Date
+                    TagMonat = $datetime.ToString("dd.MM.")
                     Uhrzeit  = $datetime.ToString("HH:mm")
                     Wochentag = $datetime.ToString("ddd", [System.Globalization.CultureInfo]::GetCultureInfo("de-DE"))
                 }
@@ -192,10 +192,10 @@ function Save-DataToExcel {
     $federalStates = @("HH","SH")
     $holidays = [Holidays]::new($federalStates)
 
-    $appointmentsData = $Appointments | Sort-Object DatumObjekt
+    $appointmentsData = $Appointments | Sort-Object Datum
 
     foreach ($row in $appointmentsData) {
-        $appointmentDate = $row.DatumObjekt.Date
+        $appointmentDate = $row.Datum
         $isPublicHoliday = $holidays.IsPublicHoliday($appointmentDate)
         $isSchoolHoliday = $holidays.IsSchoolHoliday($appointmentDate)
 
@@ -211,7 +211,7 @@ function Save-DataToExcel {
         }
     }
 
-    $appointmentsToSave = $appointmentsData | Select-Object Name, DatumObjekt, Uhrzeit, Wochentag, Anmerkung 
+    $appointmentsToSave = $appointmentsData | Select-Object Name, Datum, Uhrzeit, Wochentag, Anmerkung 
     Save-ExcelFile -Data $appointMentsToSave -Path $finalFilePath -SheetName $appointmentsSheetName
 
     $rowsToHighlight = @()
@@ -241,12 +241,13 @@ try {
     $startDate, $endDate = Get-QuarterDates -Quarter $quarter -Year $year
 
     $birthdays = Get-Birthdays -From $startDate -To $endDate
-    Out-Message "$($birthdays.Count) Geburtstage gefunden."
+    Out-Message "$($birthdays.Count) Geburtstage gefunden:"
+    $birthdays | Sort-Object Tag | Select-Object Name, Tag | Format-Table -AutoSize
     Out-Line
     
     $appointments = Get-AppointmentDates -FilePath $configFilePath -StartDate $startDate
     Out-Message "Generierte Termine:"
-    $appointments | Sort-Object DatumObjekt | Select-Object Name, Datum, Uhrzeit, Wochentag | Format-Table -AutoSize
+    $appointments | Sort-Object Datum | Select-Object Name, TagMonat, Uhrzeit, Wochentag | Format-Table -AutoSize
 
     $returnValues = Save-DataToExcel -Birthdays $birthdays -Appointments $appointments -SaveFileName $saveFileName
     $excelFilePath = $returnValues | Where-Object { Test-Path $_ }

@@ -15,7 +15,7 @@
         $personShortName = "$($personAttrs.firstName) $($personAttrs.lastName[0])."
         $birthday = [PSCustomObject]@{
             Name = $personShortName
-            Tag = $birthdayDate.ToString("dd.MM.")
+            Tag = $birthdayDate.Date
         }
         $birthdays += $birthday
     }
