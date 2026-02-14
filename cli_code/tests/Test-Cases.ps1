@@ -29,22 +29,37 @@
         }
 
         $testName = if ($testCase.ContainsKey("Name")) { $testCase.Name } else { "(unnamed test)" }
-        Write-Host ("Running test '{0}' for command {1}" -f $testName, $CommandName) -ForegroundColor Gray
+        Write-Host ("Test '{0}'" -f $testName) -ForegroundColor White
 
         try {
             # no console outputs
-            & "$PSScriptRoot\..\$mainCommand.ps1" $CommandName @arguments *>$null 2>&1
-
-            # only suppress stout, errs visible:
-            # & "$PSScriptRoot\..\bgh.ps1" $CommandName @arguments >$null
+            #& "$PSScriptRoot\..\$mainCommand.ps1" $CommandName @arguments *>$null 2>&1
+            
+            $output = & "$PSScriptRoot\..\bgh.ps1" $CommandName @arguments *>&1
+            $fullOutput = $output -join "`n"
             
             $actualExitCode = $LASTEXITCODE
+            $failure = $false
+            $failureMessage = ""
 
             if ($actualExitCode -ne $expectedExitCode) {
-                Write-Host ("Fehler: erwarteter ExitCode {0}, tatsächlich {1}" -f $expectedExitCode, $actualExitCode) -ForegroundColor Red
+                $failureMessage = ("Expected exit code {0} but is {1}" -f $expectedExitCode, $actualExitCode)
+                $failure = $true
+            }
+
+            if ($testCase.ContainsKey("ExpectedErrorMessage")) {
+                $expectedMsg = [regex]::Escape($testCase.ExpectedErrorMessage)
+                if (-not ($fullOutput -match $expectedMsg)) {
+                    $failureMessage = "Expected error message '$($testCase.ExpectedErrorMessage)' not found"
+                    $failure = $true
+                }
+            }
+
+            if ($failure) {
                 $failed++
+                Write-Host $failureMessage -ForegroundColor Red
             } else {
-                Write-Host "Test erfolgreich" -ForegroundColor Green
+                Write-Host "Success" -ForegroundColor Green
                 $passed++
             }
 
