@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run Tests from CLI
-        shell: pwsh
+        shell: powershell
         run: |
           Set-Location -Path "./cli_code/tests"
           .\run.ps1 -WriteOutput $true
