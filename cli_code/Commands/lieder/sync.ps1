@@ -25,6 +25,9 @@ function Assert-SyncArg {
 try {
     Assert-SyncArg -Key "von" -Value $from
     Assert-SyncArg -Key "nach" -Value $to
+    if ($from -eq $to) {
+        throw "'von' und 'nach' dürfen nicht identisch sein"
+    }
 
     $songs = Get-Songs
 
