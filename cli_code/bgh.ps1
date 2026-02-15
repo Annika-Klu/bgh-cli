@@ -11,15 +11,10 @@ Set-Location -Path $PSScriptRoot
 $global:CLI_TESTMODE = $AdditionalArgs -contains "TESTMODE"
 
 $global:CLI_HOSTINPUTS = @{}
-foreach ($arg in $AdditionalArgs) {
-    if ($arg -like "HOSTINPUTS=*") {
-        $json = $arg.Substring(13)
-        try {
-            $global:CLI_HOSTINPUTS = ConvertFrom-Json $json
-        } catch {
-            $global:CLI_HOSTINPUTS = @{}
-        }
-    }
+$hostInputArg = $AdditionalArgs | Where-Object { $_ -like "HOSTINPUTS=*" } | Select-Object -First 1
+if ($hostInputArg) {
+    $json = $hostInputArg -replace "HOSTINPUTS=", ""
+    $global:CLI_HOSTINPUTS = ConvertFrom-Json $json
 }
 
 $AdditionalArgs = $AdditionalArgs | Where-Object {
