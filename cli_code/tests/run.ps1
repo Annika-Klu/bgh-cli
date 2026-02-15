@@ -43,3 +43,5 @@ $toalTestsRun = $passedTotal + $failedTotal
 
 Write-Host "`n--------------------------`n"
 Write-Host "$toalTestsRun TESTS COMPLETED.`nPassed $passedTotal, failed $failedTotal" -ForegroundColor Cyan
+
+if ($failedTotal -gt 0) { exit 1 }

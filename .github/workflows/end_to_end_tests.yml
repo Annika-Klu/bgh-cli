@@ -1,0 +1,23 @@
+name: Run End-to-End Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  run-tests:
+    runs-on: windows-latest
+    
+    env:
+      CT_LOGIN_TOKEN: ${{ secrets.CT_LOGIN_TOKEN }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Run Tests from CLI
+        shell: pwsh
+        run: |
+          Set-Location -Path "./cli_code/tests"
+          .\run.ps1 -WriteOutput $true
+          
