@@ -4,7 +4,9 @@
         [Array]$Cases,
 
         [Parameter(Mandatory)]
-        [string]$CommandName
+        [string]$CommandName,
+
+        [boolean]$WriteOutput
     )
 
     $mainCommand = "bgh"
@@ -45,6 +47,7 @@
 
             $output = & "$PSScriptRoot\..\bgh.ps1" @commandParts @arguments *>&1
             $fullOutput = $output -join "`n"
+            if ($WriteOutput) { Write-Host $fullOutput }
 
             $actualExitCode = $LASTEXITCODE
 

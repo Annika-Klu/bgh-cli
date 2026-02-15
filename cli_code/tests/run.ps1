@@ -1,5 +1,6 @@
 ﻿param(
-    [string]$TestFilesRoot = "$PSScriptRoot/cases"
+    [string]$TestFilesRoot = "$PSScriptRoot/cases",
+    [switch]$WriteOutput
 )
 
 . "$PSScriptRoot/Test-Cases.ps1"
@@ -24,7 +25,7 @@ foreach ($file in $testFiles) {
         Write-Host "`n--------------------------"
         $testCases = . $file.FullName
         Write-Host ("`nRUNNING TESTS FOR '{0}'" -f $commandName) -ForegroundColor Cyan
-        ($passed, $failed) = Test-Cases -Cases $testCases -CommandName $commandName
+        ($passed, $failed) = Test-Cases -Cases $testCases -CommandName $commandName -WriteOutput $WriteOutput
         
         Write-Host ("`nFINISHED | Passed: {1}, Failed: {2}" -f $commandName, $passed, $failed) -ForegroundColor Cyan
         
