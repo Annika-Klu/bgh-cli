@@ -1,5 +1,5 @@
 ﻿param(
-    [string]$TestFilesRoot,
+    [string]$TestNameMatch = "",
     [switch]$WriteOutput
 )
 
@@ -21,7 +21,11 @@ try {
 }
 
 $TestFilesRoot = Join-Path $originalLocation "commands"
+
 $testFiles = Get-ChildItem -Path $TestFilesRoot -Recurse -Filter *.tests.ps1 | Sort-Object Name
+if ($TestNameMatch) {
+    $testFiles = $testFiles | Where-Object { $_.BaseName -like "*$TestNameMatch*" }
+}
 
 if (-not $testFiles) {
     Write-Host "No tests found" -ForegroundColor Yellow
