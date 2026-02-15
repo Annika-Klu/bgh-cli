@@ -45,7 +45,7 @@
         try {
             $commandParts = $CommandName.Trim().Split(" ")
 
-            $output = & "$PSScriptRoot\..\bgh.ps1" @commandParts @arguments *>&1
+            $output = & "$PSScriptRoot\..\cli_code\bgh.ps1" @commandParts @arguments *>&1
             $fullOutput = $output -join "`n"
             if ($WriteOutput) { Write-Host $fullOutput }
 

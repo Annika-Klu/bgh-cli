@@ -15,5 +15,14 @@
             Subdomain = "bgh"
             LoginToken = "abc"
         }
+    },
+    @{
+        Name = "Success if correct token"
+        ExpectedMessage = "Das CLI ist jetzt fertig konfiguriert"
+        ExpectedExitCode = 0
+        HostInputs = @{
+            Subdomain = "bgh"
+            LoginToken = $env:CT_LOGIN_TOKEN
+        }
     }
 )

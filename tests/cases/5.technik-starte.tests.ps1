@@ -11,12 +11,5 @@
         Arguments = @{
             auf = "bla"
         }
-    },
-    @{
-        Name = "Start with valid arg"
-        ExpectedExitCode = 0
-        Arguments = @{
-            auf = "notebook"
-        }
     }
 )

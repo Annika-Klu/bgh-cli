@@ -36,6 +36,8 @@ try {
         exit 1
     }
 
+    Write-Host $Command
+
     Set-Variable -Name "BASE_CMD" -Value $Command -Scope Global
 
     $parsedCmd = @{}
