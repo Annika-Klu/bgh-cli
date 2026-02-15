@@ -3,13 +3,14 @@ function Install-Cli {
         [string]$InstallPath
     )
 
-    if (Test-Path $TestRoot) {
-        Remove-Item $TestRoot -Recurse -Force
+    if (Test-Path $InstallPath) {
+        Remove-Item $InstallPath -Recurse -Force
     }
-
-    New-Item -ItemType Directory -Path $TestRoot | Out-Null
-    Copy-Item "$source\*" $TestRoot -Recurse -Force
-    Get-ChildItem $TestRoot -Recurse -Include *.json,*.sec | Remove-Item -Force
+    
+    $source = "$PSScriptRoot\..\cli_code"
+    New-Item -ItemType Directory -Path $InstallPath | Out-Null
+    Copy-Item "$source\*" $InstallPath -Recurse -Force
+    Get-ChildItem $InstallPath -Recurse -Include *.json,*.sec | Remove-Item -Force
 
     Write-Host "CLI installed" -ForegroundColor Cyan
 }
