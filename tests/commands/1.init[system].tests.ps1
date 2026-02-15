@@ -1,7 +1,7 @@
 ﻿@(
     @{
         Name = "Exit if incorrect subdomain (user mode: prompt loop)"
-        ExpectedMessage = "Wrong subdomain provided in test mode"
+        ExpectedOutputs = @("Wrong subdomain provided in test mode")
         ExpectedExitCode = 1
         HostInputs = @{
             Subdomain = "klwel"
@@ -9,7 +9,7 @@
     },
     @{
         Name = "Exit if incorrect token (user mode: prompt loop)"
-        ExpectedMessage = "Nicht autorisiert"
+        ExpectedOutputs = @("Nicht autorisiert")
         ExpectedExitCode = 1
         HostInputs = @{
             Subdomain = "bgh"
@@ -18,7 +18,7 @@
     },
     @{
         Name = "Success if correct token"
-        ExpectedMessage = "Das CLI ist jetzt fertig konfiguriert"
+        ExpectedOutputs = @("Das CLI ist jetzt fertig konfiguriert")
         ExpectedExitCode = 0
         HostInputs = @{
             Subdomain = "bgh"

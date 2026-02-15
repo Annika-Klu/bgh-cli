@@ -1,4 +1,23 @@
-﻿function Test-Commands {
+﻿function Check-FailedOutputs {
+    param(
+        [Array]$ExpectedOutputs,
+        [string]$FullOutput
+    )
+
+    $someFailed = $false
+    foreach($output in $ExpectedOutputs) {
+        $expectedMsg = [regex]::Escape($output)
+        if (-not ($FullOutput -match $expectedMsg)) {
+            Write-Host ("- Output '{0}' not found" -f $output) -ForegroundColor Red
+            $someFailed = $true
+        } else {
+            Write-Host ("- Output contains '{0}'" -f $output) -ForegroundColor White
+        }
+    }
+    return $someFailed
+}
+
+function Test-Commands {
     param(
         [Parameter(Mandatory)]
         [string]$TestRoot,
@@ -63,14 +82,9 @@
                 Write-Host "- Exit code is $expectedExitCode" -ForegroundColor White
             }
 
-            if ($testCase.ContainsKey("ExpectedMessage") -and $testCase.ExpectedMessage) {
-                $expectedMsg = [regex]::Escape($testCase.ExpectedMessage)
-                if (-not ($fullOutput -match $expectedMsg)) {
-                    Write-Host ("- Expected message '{0}' not found" -f $testCase.ExpectedMessage) -ForegroundColor Red
-                    $failure = $true
-                } else {
-                    Write-Host ("- Expected message '{0}'" -f $testCase.ExpectedMessage) -ForegroundColor White
-                }
+            if ($testCase.ContainsKey("ExpectedOutputs") -and $testCase.ExpectedOutputs) {
+                $failedOutputs = Check-FailedOutputs -ExpectedOutputs $testCase.ExpectedOutputs -FullOutput $fullOutput
+                if (-not $failure) { $failure = ($failedOutputs -gt 0) }
             }
 
             if ($failure) {
