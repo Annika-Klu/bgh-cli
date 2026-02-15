@@ -1,8 +1,8 @@
 ﻿@(
     @{
-        Name = "Exit if incorrect subdomain provided (user mode: prompt loop)"
+        Name = "Exit if incorrect subdomain (user mode: prompt loop)"
         ExpectedMessage = "Wrong subdomain provided in test mode"
-        ExpectedExitCode = 0
+        ExpectedExitCode = 1
         HostInputs = @{
             Subdomain = "klwel"
         }
@@ -10,7 +10,7 @@
     @{
         Name = "Exit if incorrect token (user mode: prompt loop)"
         ExpectedMessage = "Nicht autorisiert"
-        ExpectedExitCode = 0
+        ExpectedExitCode = 1
         HostInputs = @{
             Subdomain = "bgh"
             LoginToken = "abc"
@@ -22,7 +22,7 @@
         ExpectedExitCode = 0
         HostInputs = @{
             Subdomain = "bgh"
-            LoginToken = $env:CT_LOGIN_TOKEN
+            LoginToken = ($env:CT_LOGIN_TOKEN)
         }
     }
 )
