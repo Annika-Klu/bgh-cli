@@ -1,6 +1,9 @@
 ﻿function Test-Commands {
     param(
         [Parameter(Mandatory)]
+        [string]$TestRoot,
+
+        [Parameter(Mandatory)]
         [Array]$Cases,
 
         [Parameter(Mandatory)]
@@ -45,7 +48,7 @@
         try {
             $commandParts = $CommandName.Trim().Split(" ")
 
-            $output = & "$PSScriptRoot\..\cli_code\bgh.ps1" @commandParts @arguments *>&1
+            $output = & "$TestRoot\bgh.ps1" @commandParts @arguments *>&1
             $fullOutput = $output -join "`n"
             if ($WriteOutput) { Write-Host $fullOutput }
 
