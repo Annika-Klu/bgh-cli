@@ -6,6 +6,7 @@ on:
 
 jobs:
   run-tests:
+    environment: tests
     runs-on: windows-latest
     
     env:
@@ -14,6 +15,12 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+
+      - name: Save env vars
+        run: |
+          echo "Setting up environment variables from secrets.env"
+          echo "$env:TEST_ENV" | Out-File -FilePath "cli_code/.env" -Encoding utf8
+        shell: powershell
 
       - name: Run Tests from CLI
         shell: powershell

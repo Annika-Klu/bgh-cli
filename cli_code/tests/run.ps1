@@ -7,7 +7,6 @@
 
 $originalLocation = Get-Location
 $TestFilesRoot = Join-Path $originalLocation "cases"
-Write-Host $TestFilesRoot
 
 $testFiles = Get-ChildItem -Path $TestFilesRoot -Recurse -Filter *.tests.ps1 | Sort-Object Name
 
