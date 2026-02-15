@@ -37,12 +37,17 @@ function Save-ApiToken {
     do {
         try {
             $pastedToken = Get-HostInput -Name "LoginToken" -Prompt "Bitte gib dein Login-Token ein"
+            $response = Invoke-WebRequest -Uri "$CT_API_URL/whoami" -Headers @{ Authorization = "Login $pastedToken" } -UseBasicParsing
+            $content = $response.Content | ConvertFrom-Json
+            if (($response.StatusCode -ne 200) -or ($content.data.lastName -eq "Anonymous")) {
+                throw "Ungültiges Token"
+            }
             Save-EncryptedToken -Token $pastedToken -Path (Join-Path $PWD "ctlogintoken.sec")
             $isValid = $true
         } catch {
-            Out-Message "Das Token konnte nicht gespeichert werden. $_" error
+            Out-Message "Fehler: $($_) Bitte erneut eingeben." error
             $isValid = $false
-            if ($CLI_TESTMODE) { throw "Token could not be saved in test mode" }
+            if ($CLI_TESTMODE) { throw "Invalid token provided in test mode" }
         }
     } until ($isValid)
 }
