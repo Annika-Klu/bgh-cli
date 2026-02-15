@@ -7,6 +7,11 @@
 
     Out-Message "Falls der Fehler häufiger auftritt und du nicht weiterkommst, kannst du ihn in der Gruppe '$groupName' melden." -Type "debug"
     
+    if ($CLI_TESTMODE) {
+        Out-Message "Skipping error msg post request due to test mode" -Type "debug"
+        return
+    }
+    
     $reportError = Get-YesOrNo "Fehler melden?"
     if (-not $reportError) { return }
 
@@ -15,6 +20,7 @@
         Out-Message "Churchtools ist nicht verfügbar." -Type "error"
         return
     }
+
     
     $content = "Fehlermeldung: '$ErrMsg'"
     $additionalInfo = Read-Host "Beschreibung zusätzlich zur Fehlermeldung (optional, sonst weiter mit Enter)"
