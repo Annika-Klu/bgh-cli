@@ -54,9 +54,9 @@ jobs:
       
           if (Test-Path $sourcePath) {
             Copy-Item -Path $sourcePath -Destination $destinationPath -Force
-            Write-Host "MeinModul.psm1 wurde erfolgreich nach '$destinationPath' kopiert."
+            Write-Host "GitHub.psm1 copied to '$destinationPath'."
           } else {
-            Write-Error "Die Datei 'MeinModul.psm1' wurde nicht gefunden: $sourcePath"
+            Write-Error "File 'GitHub.psm1' not found in $sourcePath"
           }
 
       - name: Create Inno Setup script from template

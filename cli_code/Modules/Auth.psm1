@@ -3,11 +3,10 @@
 function Set-ApiUrl {
     do {
         $subdomain = $CT_SUBDOMAIN
-        if (-not $subdomain) {
-            $subdomain = Read-Host "Welche Subdomain hat deine Gemeinde? (z. B. bei 'https://beispielgemeinde.church.tools' gib ein 'beispielgemeinde'.)"
+        if ((-not $subdomain) -or $global:CLI_TESTMODE) {
+            $subdomain = Get-HostInput -Name "Subdomain" -Prompt "Welche Subdomain hat deine Gemeinde? (z. B. bei 'https://beispielgemeinde.church.tools' gib ein 'beispielgemeinde'.)"
         }
         $churchUrl = "https://$subdomain.church.tools"
-
         $errorMsg = "Ungültige Eingabe: '$subdomain.church.tools' existiert nicht."
 
         try {
@@ -16,6 +15,7 @@ function Set-ApiUrl {
             if ($body -match "Finde deine Gemeinde") {
                 Out-Message $errorMsg error
                 $isValid = $false
+                if ($CLI_TESTMODE) { throw "Wrong subdomain provided in test mode" }
             } else {
                 Out-Message "Anmelden bei: $churchUrl"
                 $isValid = $true
@@ -23,6 +23,7 @@ function Set-ApiUrl {
         } catch {
             Out-Message $errorMsg error
             $isValid = $false
+            if ($CLI_TESTMODE) { throw "Exception in Set-ApiUrl in test mode $_" }
         }
 
     } until ($isValid)
@@ -35,12 +36,18 @@ function Save-ApiToken {
     )
     do {
         try {
-            $pastedToken = Read-Host "Bitte gib dein Login-Token ein"
+            $pastedToken = Get-HostInput -Name "LoginToken" -Prompt "Bitte gib dein Login-Token ein"
+            $response = Invoke-WebRequest -Uri "$CT_API_URL/whoami" -Headers @{ Authorization = "Login $pastedToken" } -UseBasicParsing
+            $content = $response.Content | ConvertFrom-Json
+            if (($response.StatusCode -ne 200) -or ($content.data.lastName -eq "Anonymous")) {
+                throw "Ungültiges Token"
+            }
             Save-EncryptedToken -Token $pastedToken -Path (Join-Path $PWD "ctlogintoken.sec")
             $isValid = $true
         } catch {
-            Out-Message "Das Token ist ungültig. $_" error
+            Out-Message "Fehler: $($_) Bitte erneut eingeben." error
             $isValid = $false
+            if ($CLI_TESTMODE) { throw "Invalid token provided in test mode" }
         }
     } until ($isValid)
 }
@@ -48,7 +55,7 @@ function Save-ApiToken {
 function Set-OutDir {
     $suggestedOutDir = "$($env:USERPROFILE)\Documents"
     do {
-        $selectedOutDir = Read-Host "Wo sollen heruntergeladene oder generierte Dateien gespeichert werden? (Ohne Eingabe bestätigen für '$suggestedOutDir')"
+        $selectedOutDir = Get-HostInput -Name "OutDir" -Prompt "Wo sollen heruntergeladene oder generierte Dateien gespeichert werden? (Ohne Eingabe bestätigen für '$suggestedOutDir')"
         if (-not $selectedOutDir) {
             return $suggestedOutDir
         }

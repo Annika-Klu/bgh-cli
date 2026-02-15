@@ -41,7 +41,7 @@ function Get-CommandPath {
         $expectedPathParts = Join-Path $expectedPathParts ($SubCommands -join "\")
     }
     $expectedPath = $expectedPathParts + ".ps1"
-    if (Test-Path $expectedPath) {
+    if (Test-Path -LiteralPath $expectedPath) {
         return $expectedPath
     } 
     return ""

@@ -1,0 +1,30 @@
+name: End-to-End Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  run-tests:
+    environment: tests
+    runs-on: windows-latest
+    
+    env:
+      CT_LOGIN_TOKEN: ${{ secrets.CT_LOGIN_TOKEN }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Save env vars
+        run: |
+          echo "Setting up environment variables from secrets.env"
+          echo "$env:TEST_ENV" | Out-File -FilePath "cli_code/.env" -Encoding utf8
+        shell: powershell
+
+      - name: Run Tests from CLI
+        shell: powershell
+        run: |
+          Set-Location -Path "./tests"
+          .\run.ps1 -WriteOutput $true
+          

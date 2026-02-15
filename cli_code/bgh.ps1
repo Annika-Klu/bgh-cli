@@ -6,16 +6,31 @@
 
 Set-Location -Path $PSScriptRoot
 
+# check for special vars needed for tests
+
+$global:CLI_TESTMODE = $AdditionalArgs -contains "TESTMODE"
+
+$global:CLI_HOSTINPUTS = @{}
+$hostInputArg = $AdditionalArgs | Where-Object { $_ -like "HOSTINPUTS=*" } | Select-Object -First 1
+if ($hostInputArg) {
+    $json = $hostInputArg -replace "HOSTINPUTS=", ""
+    $global:CLI_HOSTINPUTS = ConvertFrom-Json $json
+}
+
+$AdditionalArgs = $AdditionalArgs | Where-Object {
+    ($_ -ne "TESTMODE") -and
+    ($_ -notlike "HOSTINPUTS=*")
+}
+# -----------------------------
+
 . "$PSScriptRoot/preflight/run.ps1" -Command $Command
 
-function Use-MentionHelp {
-    Out-Message "Mit 'bgh hilfe' kannst du eine Liste aller Befehle anzeigen lassen."
-}
+$mentionHelpMessage = "Mit 'bgh hilfe' kannst du eine Liste aller Befehle anzeigen lassen."
 
 try {
     if (-not $Command) {
         Out-Message "Bitte Befehl eingeben und mit der Eingabetaste bestätigen."
-        Use-MentionHelp
+        Out-Message $mentionHelpMessage
         exit 1
     }
 
@@ -38,7 +53,7 @@ try {
     $commandPath = Get-CommandPath -CommandsDir $commandsDir -Command $Command -SubCommands $parsedCmd.Subcommands
     if (-not $commandPath) {
         Out-Message "'$Command $AdditionalArgs' ist kein gültiger Befehl."
-        Use-MentionHelp
+        Out-Message $mentionHelpMessage
         exit 1
     }
 
