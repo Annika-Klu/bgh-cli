@@ -25,18 +25,14 @@ $AdditionalArgs = $AdditionalArgs | Where-Object {
 
 . "$PSScriptRoot/preflight/run.ps1" -Command $Command
 
-function Use-MentionHelp {
-    Out-Message "Mit 'bgh hilfe' kannst du eine Liste aller Befehle anzeigen lassen."
-}
+$mentionHelpMessage = "Mit 'bgh hilfe' kannst du eine Liste aller Befehle anzeigen lassen."
 
 try {
     if (-not $Command) {
         Out-Message "Bitte Befehl eingeben und mit der Eingabetaste bestätigen."
-        Use-MentionHelp
+        Out-Message $mentionHelpMessage
         exit 1
     }
-
-    Write-Host $Command
 
     Set-Variable -Name "BASE_CMD" -Value $Command -Scope Global
 
@@ -57,7 +53,7 @@ try {
     $commandPath = Get-CommandPath -CommandsDir $commandsDir -Command $Command -SubCommands $parsedCmd.Subcommands
     if (-not $commandPath) {
         Out-Message "'$Command $AdditionalArgs' ist kein gültiger Befehl."
-        Use-MentionHelp
+        Out-Message $mentionHelpMessage
         exit 1
     }
 
