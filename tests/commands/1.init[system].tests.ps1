@@ -1,15 +1,15 @@
 ﻿@(
     @{
-        Name = "Exit if incorrect subdomain (user mode: prompt loop)"
-        ExpectedOutputs = @("Wrong subdomain provided in test mode")
+        Name = "Fail if incorrect subdomain (user mode: prompt loop)"
+        ExpectedOutputs = @("Wrong subdomain provided in test mode", "401")
         ExpectedExitCode = 1
         HostInputs = @{
             Subdomain = "klwel"
         }
     },
     @{
-        Name = "Exit if incorrect token (user mode: prompt loop)"
-        ExpectedOutputs = @("Nicht autorisiert")
+        Name = "Fail if incorrect token (user mode: prompt loop)"
+        ExpectedOutputs = @("Invalid token provided in test mode", "401")
         ExpectedExitCode = 1
         HostInputs = @{
             Subdomain = "bgh"
