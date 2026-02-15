@@ -1,12 +1,13 @@
 ﻿param(
-    [string]$TestFilesRoot = "$PWD/cli_code/tests/cases",
+    [string]$TestFilesRoot,
     [switch]$WriteOutput
 )
 
 . "$PSScriptRoot/Test-Cases.ps1"
 
 $originalLocation = Get-Location
-Write-Host $originalLocation
+$TestFilesRoot = Join-Path $originalLocation "cases"
+Write-Host $TestFilesRoot
 
 $testFiles = Get-ChildItem -Path $TestFilesRoot -Recurse -Filter *.tests.ps1 | Sort-Object Name
 
