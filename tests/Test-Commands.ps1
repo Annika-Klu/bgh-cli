@@ -1,4 +1,4 @@
-﻿function Test-Cases {
+﻿function Test-Commands {
     param(
         [Parameter(Mandatory)]
         [Array]$Cases,

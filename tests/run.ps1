@@ -3,11 +3,11 @@
     [switch]$WriteOutput
 )
 
-. "$PSScriptRoot/Test-Cases.ps1"
+. "$PSScriptRoot/Test-Commands.ps1"
 
 $originalLocation = Get-Location
-$TestFilesRoot = Join-Path $originalLocation "cases"
 
+$TestFilesRoot = Join-Path $originalLocation "commands"
 $testFiles = Get-ChildItem -Path $TestFilesRoot -Recurse -Filter *.tests.ps1 | Sort-Object Name
 
 if (-not $testFiles) {
@@ -27,7 +27,7 @@ foreach ($file in $testFiles) {
         Write-Host "`n--------------------------"
         $testCases = . $file.FullName
         Write-Host ("`nRUNNING TESTS FOR '{0}'" -f $commandName) -ForegroundColor Cyan
-        ($passed, $failed) = Test-Cases -Cases $testCases -CommandName $commandName -WriteOutput $WriteOutput
+        ($passed, $failed) = Test-Commands -Cases $testCases -CommandName $commandName -WriteOutput $WriteOutput
         
         Write-Host ("`nFINISHED | Passed: {1}, Failed: {2}" -f $commandName, $passed, $failed) -ForegroundColor Cyan
         
