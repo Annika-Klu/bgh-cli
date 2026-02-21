@@ -1,4 +1,6 @@
-﻿function Test-JsonContent {
+Add-Type -AssemblyName System.Drawing
+
+function Test-JsonContent {
     param (
         [string]$JsonPath
     )
